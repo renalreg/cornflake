@@ -1,9 +1,9 @@
 import collections
-import six
 from datetime import date, datetime
 import copy
 import uuid
 
+import six
 import delorean
 
 
@@ -336,7 +336,6 @@ class DateField(Field):
             return value
 
     def to_representation(self, value):
-        # TODO(rupert) always %Y-%m-%d
         return value.isoformat()
 
 
@@ -364,7 +363,6 @@ class DateTimeField(Field):
             return value
 
     def to_representation(self, value):
-        # TODO(rupert) always %Y-%m-%dT%H:%M:%S+00:00
         return value.isoformat()
 
 
