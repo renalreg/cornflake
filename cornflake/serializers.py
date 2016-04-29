@@ -1,6 +1,6 @@
 import copy
 
-from fields import Field, ValidationError, SkipField, empty
+from cornflake.fields import Field, ValidationError, SkipField, empty
 
 
 class BaseSerializer(Field):
@@ -75,7 +75,8 @@ class Serializer(BaseSerializer):
     }
 
     def get_fields(self):
-        raise NotImplementedError
+        # TODO
+        return {}
 
     @property
     def fields(self):

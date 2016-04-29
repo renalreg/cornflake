@@ -79,6 +79,8 @@ class Field(object):
 
             raise e
 
+        return instance
+
     def get_value(self, data):
         return data.get(self.field_name, empty)
 
@@ -270,7 +272,7 @@ class DateField(Field):
             return value
 
     def to_representation(self, value):
-        # TODO always %Y-%m-%d
+        # TODO(rupert) always %Y-%m-%d
         return value.isoformat()
 
 
@@ -298,7 +300,7 @@ class DateTimeField(Field):
             return value
 
     def to_representation(self, value):
-        # TODO always %Y-%m-%dT%H:%M:%S+00:00
+        # TODO(rupert) always %Y-%m-%dT%H:%M:%S+00:00
         return value.isoformat()
 
 
