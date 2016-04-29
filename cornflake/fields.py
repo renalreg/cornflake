@@ -78,12 +78,18 @@ class SkipField(Exception):
 
 
 class Field(object):
+    _creation_counter = 0
+
     error_messages = {
         'required': 'This field is required.',
         'null': 'This field may not be null.'
     }
 
     def __init__(self, source=None, read_only=False, write_only=False, required=None, default=empty, validators=None, null=False, error_messages=None):
+        # Keep track of field declaration order
+        self._creation_counter = Field._creation_counter
+        Field._creation_counter += 1
+
         if required is None:
             required = default is empty and not read_only
 

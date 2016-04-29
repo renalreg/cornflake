@@ -1,4 +1,7 @@
 import copy
+from collections import OrderedDict
+
+import six
 
 from cornflake.fields import Field, ValidationError, SkipField, empty
 
@@ -69,14 +72,63 @@ class BaseSerializer(Field):
         return self.instance
 
 
+class SerializerMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        attrs['_declared_fields'] = SerializerMetaclass.get_fields(bases, attrs)
+        return super(SerializerMetaclass, cls).__new__(cls, name, bases, attrs)
+
+    @staticmethod
+    def get_fields(bases, attrs):
+        fields = []
+
+        # Get the fields declared on this class
+        for field_name, obj in list(attrs.items()):
+            if isinstance(obj, Field):
+                fields.append((field_name, attrs.pop(field_name)))
+
+        # Sort the fields in the order they were declared
+        fields.sort(key=lambda x: x[1]._creation_counter)
+
+        # Loop in reverse to maintain correct field ordering
+        for serializer_class in reversed(bases):
+            if hasattr(serializer_class, '_declared_fields'):
+                # Copy fields from another serializer
+                # Parent serializer's fields go first
+                fields = list(serializer_class._declared_fields.items()) + fields
+            else:
+                # Copy fields from mixins
+                mixin_fields = SerializerMetaclass.get_mixin_fields(serializer_class).items()
+
+                # Sort the mixin fields in the order they were declared
+                mixin_fields.sort(key=lambda x: x[1]._creation_counter)
+
+                # Add the mixin fields
+                fields = mixin_fields + fields
+
+        return OrderedDict(fields)
+
+    @staticmethod
+    def get_mixin_fields(field_class):
+        fields = {}
+
+        for field_mixin_klass in reversed(field_class.__bases__):
+            fields.update(SerializerMetaclass.get_mixin_fields(field_mixin_klass))
+
+        for field_name, obj in field_class.__dict__.items():
+            if isinstance(obj, Field):
+                fields[field_name] = obj
+
+        return fields
+
+
+@six.add_metaclass(SerializerMetaclass)
 class Serializer(BaseSerializer):
     error_messages = {
         'not_a_dict': 'Expected an object.'
     }
 
     def get_fields(self):
-        # TODO
-        return {}
+        return copy.deepcopy(self._declared_fields)
 
     @property
     def fields(self):
