@@ -1,6 +1,6 @@
 [run]
 branch = true
-omit = radar/tests/*
+omit = cornflake/tests/*
 
 [html]
 directory = coverage
