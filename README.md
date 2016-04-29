@@ -5,6 +5,8 @@
 Cornflake is a serialization library based on [Django REST Framework](http://www.django-rest-framework.org/).
 
 ```python
+# example.py
+
 from cornflake.fields import StringField, DateField, ValidationError
 from cornflake.serializers import Serializer
 from cornflake.validators import not_empty, not_in_future
@@ -47,7 +49,7 @@ class Patient(object):
 ```
 
 ```python
->>> from foo import Patient, PatientSerializer
+>>> from example import Patient, PatientSerializer
 >>> # Create a patient
 >>> serializer = PatientSerializer(data={'first_name': 'John', 'last_name': 'Smith', 'birth_date': '2001-02-03'})
 >>> serializer.is_valid()
