@@ -1,10 +1,11 @@
 import collections
-from datetime import date, datetime
 import copy
 import uuid
+from datetime import date, datetime
 
 import six
-import delorean
+
+from cornflake.utils import parse_datetime
 
 
 empty = object()
@@ -329,7 +330,7 @@ class DateField(Field):
             self.fail('invalid')
         else:
             try:
-                value = delorean.parse(data).date
+                value = parse_datetime(data).date()
             except ValueError:
                 self.fail('invalid')
 
@@ -356,7 +357,7 @@ class DateTimeField(Field):
             self.fail('invalid')
         else:
             try:
-                value = delorean.parse(data).datetime
+                value = parse_datetime(data)
             except ValueError:
                 self.fail('invalid')
 

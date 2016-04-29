@@ -2,6 +2,7 @@ import re
 from datetime import date, datetime
 
 import pytz
+from dateutil.parser import parse as _parse_datetime
 
 
 def is_date(x):
@@ -54,3 +55,12 @@ def safe_strftime(value, format):
         value_dt = value
 
     return re.sub('%(.)', lambda x: safe_strftime_replace(value_dt, x.group(1)), format)
+
+
+def parse_datetime(value):
+    dt = _parse_datetime(value)
+
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=pytz.utc)
+
+    return dt
