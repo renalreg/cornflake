@@ -12,7 +12,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'bleach',
-        'python-dateutil',
+        'iso8601',
         'pytz',
         'six',
     ],

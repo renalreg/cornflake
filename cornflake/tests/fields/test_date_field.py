@@ -15,7 +15,7 @@ def test_to_representation(value, expected):
 
 @pytest.mark.parametrize(('data', 'expected'), [
     ('2001-02-03', date(2001, 2, 3)),
-    ('999-2-3', date(999, 2, 3)),
+    ('0999-2-3', date(999, 2, 3)),
     ('2001-02-03T12:34:56', date(2001, 2, 3)),
     ('2001-02-03 12:34:56', date(2001, 2, 3)),
 ])

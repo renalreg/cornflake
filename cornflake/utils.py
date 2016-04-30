@@ -1,8 +1,9 @@
+import sys
 import re
 from datetime import date, datetime
 
 import pytz
-from dateutil.parser import parse as _parse_datetime
+import iso8601
 
 
 def is_date(x):
@@ -58,9 +59,7 @@ def safe_strftime(value, format):
 
 
 def parse_datetime(value):
-    dt = _parse_datetime(value)
-
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=pytz.utc)
-
-    return dt
+    try:
+        return iso8601.parse_date(value)
+    except iso8601.ParseError:
+        raise ValueError('Invalid date'), None, sys.exc_info()[2]

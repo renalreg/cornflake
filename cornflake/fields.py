@@ -315,7 +315,7 @@ class FloatField(Field):
 
 class DateField(Field):
     error_messages = {
-        'invalid': 'Date has wrong format.',
+        'invalid': 'Invalid date format.',
         'datetime': 'Expected a date but got a datetime.',
     }
 
@@ -342,7 +342,7 @@ class DateField(Field):
 
 class DateTimeField(Field):
     error_messages = {
-        'invalid': 'Datetime has wrong format.',
+        'invalid': 'Invalid date format.',
         'date': 'Expected a date but got a datetime.',
     }
 
