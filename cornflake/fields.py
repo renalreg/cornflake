@@ -140,6 +140,7 @@ class Field(object):
 
         value = self.to_internal_value(data)
         value = self.run_validators(value)
+        value = self.validate(value)
 
         return value
 
@@ -147,6 +148,9 @@ class Field(object):
         for validator in self.validators:
             value = validator(value)
 
+        return value
+
+    def validate(self, value):
         return value
 
     @property
