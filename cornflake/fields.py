@@ -316,17 +316,17 @@ class DateTimeField(Field):
 
 
 class ListField(Field):
-    child_field = None
+    child = None
 
     error_messages = {
         'not_a_list': 'Expected a list.'
     }
 
     def __init__(self, *args, **kwargs):
-        self.child_field = kwargs.pop('child_field', copy.deepcopy(self.child_field))
+        self.child = kwargs.pop('child', copy.deepcopy(self.child))
         assert self.child is not None
         super(ListField, self).__init__(*args, **kwargs)
-        self.child_field.bind(self)
+        self.child.bind(self)
 
     def to_internal_value(self, data):
         if not isinstance(data, list):
@@ -337,7 +337,7 @@ class ListField(Field):
 
         for i, x in enumerate(data):
             try:
-                value = self.child_field.to_internal_value(x)
+                value = self.child.to_internal_value(x)
             except ValidationError as e:
                 errors[i] = e.errors
             else:
@@ -352,23 +352,23 @@ class ListField(Field):
         data = []
 
         for value in values:
-            data.append(self.child_field.to_representation(value))
+            data.append(self.child.to_representation(value))
 
         return data
 
 
 class CommaSeparatedField(Field):
-    child_field = None
+    child = None
 
     error_messages = {
         'invalid': 'A valid string is required.'
     }
 
     def __init__(self, field, **kwargs):
-        self.child = kwargs.pop('child_field', copy.deepcopy(self.child_field))
-        assert self.child_field is not None
+        self.child = kwargs.pop('child', copy.deepcopy(self.child))
+        assert self.child is not None
         super(CommaSeparatedField, self).__init__(**kwargs)
-        self.child_field.bind(self)
+        self.child.bind(self)
 
     def to_internal_value(self, data):
         if isinstance(data, dict) or isinstance(data, list) or isinstance(data, bool):
@@ -378,7 +378,7 @@ class CommaSeparatedField(Field):
         values = []
 
         for part in parts:
-            value = self.child_field.to_value(part)
+            value = self.child.to_value(part)
             values.append(value)
 
         return values

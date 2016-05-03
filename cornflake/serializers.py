@@ -232,17 +232,17 @@ class Serializer(BaseSerializer):
 
 
 class ListSerializer(BaseSerializer):
-    child_serializer = None
+    child = None
 
     default_error_messages = {
         'not_a_list': 'Expected a list.'
     }
 
     def __init__(self, *args, **kwargs):
-        self.child_serializer = kwargs.pop('child_serializer', copy.deepcopy(self.child_serializer))
-        assert self.child_serializer is not None
+        self.child = kwargs.pop('child', copy.deepcopy(self.child))
+        assert self.child is not None
         super(ListSerializer, self).__init__(*args, **kwargs)
-        self.child_serializer.bind(self)
+        self.child.bind(self)
 
     def run_validation(self, data):
         value = self.to_internal_value(data)
@@ -270,7 +270,7 @@ class ListSerializer(BaseSerializer):
 
         for i, x in enumerate(data):
             try:
-                value = self.child_serializer.to_internal_value(x)
+                value = self.child.to_internal_value(x)
             except ValidationError as e:
                 errors[i] = e.errors
             else:
@@ -285,9 +285,9 @@ class ListSerializer(BaseSerializer):
         data = []
 
         for value in values:
-            data.append(self.child_serializer.to_representation(value))
+            data.append(self.child.to_representation(value))
 
         return data
 
     def create(self, validated_data):
-        return [self.child_serializer.create(value) for value in validated_data]
+        return [self.child.create(value) for value in validated_data]
