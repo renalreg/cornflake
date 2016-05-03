@@ -17,13 +17,18 @@ class BaseSerializer(Field):
             if default_validators is not None and kwargs.get('validators') is None:
                 kwargs['validators'] = default_validators
 
+        context = kwargs.pop('context', None)
+
         super(BaseSerializer, self).__init__(**kwargs)
 
         if data is None:
-            data = dict()
+            data = {}
 
         self.instance = instance
         self.initial_data = data
+
+        if context is not None:
+            self._context = context
 
         self.errors = {}
         self.validated_data = {}

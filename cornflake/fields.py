@@ -64,6 +64,8 @@ class Field(object):
         self.field_name = None
         self.parent = None
 
+        self._context = {}
+
     def bind(self, parent, field_name=None):
         self.field_name = field_name
         self.parent = parent
@@ -73,6 +75,10 @@ class Field(object):
 
     def fail(self, key):
         raise ValidationError(self.error_messages[key])
+
+    @property
+    def context(self):
+        return self.root._context
 
     def get_attribute(self, instance):
         try:
