@@ -146,6 +146,9 @@ class Field(object):
 
     def run_validators(self, value):
         for validator in self.validators:
+            if hasattr(validator, 'set_context'):
+                validator.set_context(self)
+
             value = validator(value)
 
         return value
