@@ -142,6 +142,7 @@ class Serializer(BaseSerializer):
 
         for field_name, field in fields.items():
             field.bind(self, field_name)
+            setattr(self, field_name, field)
 
         return fields
 
