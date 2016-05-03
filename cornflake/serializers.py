@@ -168,18 +168,28 @@ class Serializer(BaseSerializer):
 
         return value
 
+    def pre_validate(self, value):
+        return value
+
     def validate(self, value):
         return value
 
     def to_internal_value(self, data):
         if not isinstance(data, dict):
-            self.fail('not_a_list')
+            self.fail('not_a_dict')
 
         errors = {}
+        field_values = {}
+
+        for field in self.writable_fields:
+            field_values[field.field_name] = field.get_value(data)
+
+        field_values = self.pre_validate(field_values)
+
         value = {}
 
         for field in self.writable_fields:
-            field_value = field.get_value(data)
+            field_value = field_values[field.field_name]
             validate_method = getattr(self, 'validate_' + field.field_name, None)
 
             try:
