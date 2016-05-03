@@ -24,20 +24,24 @@ class Field(object):
         'null': 'This field may not be null.'
     }
 
-    def __init__(self, source=None, read_only=False, write_only=False, required=None, default=empty, validators=None, null=False, error_messages=None):
+    def __init__(self, source=None, read_only=False, write_only=False, required=None, default=None, validators=None, null=None, error_messages=None):
         # Keep track of field declaration order
         self._creation_counter = Field._creation_counter
         Field._creation_counter += 1
 
         if required is None:
-            required = default is empty and not read_only
+            # Required if no default supplied and the field is writable
+            required = default is None and not read_only
+
+        if null is None:
+            # Allow nulls when the field is optional
+            null = not required
 
         if validators is None:
             validators = list()
 
         assert not (read_only and write_only)
         assert not (required and read_only)
-        assert not (required and default is not empty)
 
         self.source = source
         self.required = required
