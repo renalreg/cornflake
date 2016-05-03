@@ -180,6 +180,20 @@ class Serializer(BaseSerializer):
     def validate(self, value):
         return value
 
+    def run_field_validators(self, data, field, validators):
+        value = field.get_attribute(data)
+
+        try:
+            for validator in self.validators:
+                if hasattr(validator, 'set_context'):
+                    validator.set_context(self)
+
+                value = validator(value)
+        except ValidationError as e:
+            raise ValidationError({field.field_name: e.errors})
+
+        data[field.source] = value
+
     def to_internal_value(self, data):
         if not isinstance(data, dict):
             self.fail('not_a_dict')
@@ -216,7 +230,7 @@ class Serializer(BaseSerializer):
         return value
 
     def to_representation(self, instance):
-        data = dict()
+        data = {}
 
         for field in self.readable_fields:
             try:
