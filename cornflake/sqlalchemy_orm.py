@@ -204,6 +204,9 @@ class ReferenceField(fields.Field):
         return instance
 
     def to_internal_value(self, data):
+        if isinstance(data, self.model_class):
+            return data
+
         if isinstance(data, dict):
             value = data.get(self.model_id)
 
