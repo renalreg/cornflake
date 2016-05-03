@@ -8,7 +8,11 @@ import six
 from cornflake.utils import parse_datetime
 
 
-empty = object()
+class _empty(object):
+    def __nonzero__(self):
+        return False
+
+empty = _empty()
 
 
 class ValidationError(Exception):
