@@ -31,3 +31,15 @@ def test_to_internal_value(data, expected):
 def test_to_internal_value_invalid(data):
     with pytest.raises(ValidationError):
         StringField().to_internal_value(data)
+
+
+def test_trim_whitespace_true():
+    field = StringField(trim_whitespace=True)
+    value = field.to_internal_value(' abc ')
+    assert value == 'abc'
+
+
+def test_trim_whitespace_false():
+    field = StringField(trim_whitespace=False)
+    value = field.to_internal_value(' abc ')
+    assert value == ' abc '
