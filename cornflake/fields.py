@@ -100,9 +100,6 @@ class Field(object):
     def get_default(self):
         default = self.default
 
-        if default is empty:
-            raise SkipField()
-
         if callable(default):
             default = default()
 
@@ -115,9 +112,6 @@ class Field(object):
         raise NotImplementedError
 
     def validate_empty_values(self, data):
-        if self.read_only:
-            return (True, self.get_default())
-
         if data is empty:
             if self.required:
                 self.fail('required')
