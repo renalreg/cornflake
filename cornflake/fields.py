@@ -411,7 +411,7 @@ class UUIDField(Field):
         value = six.text_type(data)
 
         try:
-            uuid.UUID(data)
+            value = six.text_type(uuid.UUID(value))
         except ValueError:
             self.fail('invalid')
 
