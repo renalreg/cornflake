@@ -91,7 +91,7 @@ def max_(max_value, units=None):
 
 
 def range_(min_value=None, max_value=None, units=None):
-    def range_f(call, value):
+    def range_f(value):
         if min_value is not None:
             value = min_(min_value, units)(value)
 
