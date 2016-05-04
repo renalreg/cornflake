@@ -214,17 +214,16 @@ class Serializer(BaseSerializer):
             self.fail('not_a_dict')
 
         errors = {}
-        field_values = {}
+        pre_value = {}
 
         for field in self.writable_fields:
-            field_values[field.field_name] = field.get_value(data)
+            pre_value[field.source] = field.get_value(data)
 
-        field_values = self.pre_validate(field_values)
-
+        pre_value = self.pre_validate(pre_value)
         value = {}
 
         for field in self.writable_fields:
-            field_value = field_values[field.field_name]
+            field_value = pre_value[field.source]
             validate_method = getattr(self, 'validate_' + field.field_name, None)
 
             try:
