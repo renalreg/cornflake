@@ -18,6 +18,7 @@ def test_to_representation(value, expected):
     ('0999-2-3', date(999, 2, 3)),
     ('2001-02-03T12:34:56', date(2001, 2, 3)),
     ('2001-02-03 12:34:56', date(2001, 2, 3)),
+    (date(2001, 2, 3), date(2001, 2, 3)),
 ])
 def test_to_internal_value(data, expected):
     assert DateField().to_internal_value(data) == expected
