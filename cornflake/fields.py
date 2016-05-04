@@ -24,6 +24,12 @@ class Field(object):
         'null': 'This field may not be null.'
     }
 
+    def __new__(cls, *args, **kwargs):
+        instance = super(Field, cls).__new__(cls)
+        instance._args = args
+        instance._kwargs = kwargs
+        return instance
+
     def __init__(self, source=None, read_only=False, write_only=False, required=None, default=None, validators=None, null=None, error_messages=None):
         # Keep track of field declaration order
         self._creation_counter = Field._creation_counter
@@ -158,6 +164,11 @@ class Field(object):
             root = root.parent
 
         return root
+
+    def __deepcopy__(self, memo):
+        args = copy.deepcopy(self._args)
+        kwargs = copy.deepcopy(self._kwargs)
+        return self.__class__(*args, **kwargs)
 
 
 class StringField(Field):
