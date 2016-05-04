@@ -231,9 +231,6 @@ class IntegerField(Field):
         if isinstance(data, basestring):
             data = data.strip()
 
-            if len(data) == 0:
-                self.fail('invalid')
-
         try:
             value = int(data)
             value_f = float(data)
@@ -258,9 +255,6 @@ class FloatField(Field):
     def to_internal_value(self, data):
         if isinstance(data, basestring):
             data = data.strip()
-
-            if len(data) == 0:
-                self.fail('invalid')
 
         try:
             value = float(data)
