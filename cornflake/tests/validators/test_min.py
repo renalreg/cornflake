@@ -20,3 +20,10 @@ def test_equal():
 
 def test_greater_than():
     min_(10)(11)
+
+
+def test_units():
+    with pytest.raises(ValidationError) as e:
+        min_(10, 'kg')(9)
+
+    assert e.value.errors[0] == 'Must be greater than or equal to 10 kg.'
