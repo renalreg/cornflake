@@ -1,4 +1,5 @@
 import collections
+from collections import OrderedDict
 
 
 class ValidationError(Exception):
@@ -8,7 +9,7 @@ class ValidationError(Exception):
     @staticmethod
     def normalise(errors):
         if isinstance(errors, dict):
-            new_errors = {}
+            new_errors = OrderedDict()
 
             for k, v in errors.items():
                 if isinstance(v, dict) or isinstance(v, list):

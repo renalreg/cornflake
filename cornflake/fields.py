@@ -93,7 +93,7 @@ class Field(object):
             else:
                 instance = getattr(instance, self.source)
         except (AttributeError, KeyError) as e:
-            if not self.required and self.default is empty:
+            if not self.required:
                 raise SkipField()
 
             raise e
@@ -149,7 +149,10 @@ class Field(object):
             if hasattr(validator, 'set_context'):
                 validator.set_context(self)
 
-            value = validator(value)
+            try:
+                value = validator(value)
+            except SkipField:
+                break
 
         return value
 
@@ -370,27 +373,36 @@ class CommaSeparatedField(Field):
         'invalid': 'A valid string is required.'
     }
 
-    def __init__(self, field, **kwargs):
+    def __init__(self, **kwargs):
         self.child = kwargs.pop('child', copy.deepcopy(self.child))
         assert self.child is not None
         super(CommaSeparatedField, self).__init__(**kwargs)
         self.child.bind(self)
 
     def to_internal_value(self, data):
-        if isinstance(data, dict) or isinstance(data, list) or isinstance(data, bool):
+        if isinstance(data, dict) or isinstance(data, bool):
             self.fail('invalid')
 
-        parts = six.text_type(data).split(',')
+        if isinstance(data, list):
+            parts = data
+        else:
+            data = six.text_type(data)
+
+            if len(data) == 0:
+                parts = []
+            else:
+                parts = data.split(',')
+
         values = []
 
         for part in parts:
-            value = self.child.to_value(part)
+            value = self.child.to_internal_value(part)
             values.append(value)
 
         return values
 
     def to_representation(self, values):
-        return ','.join(six.text_type(value) for value in values)
+        return ','.join(six.text_type(self.child.to_representation(value)) for value in values)
 
 
 class UUIDField(Field):
