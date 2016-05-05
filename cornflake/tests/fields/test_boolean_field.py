@@ -52,7 +52,5 @@ def test_to_internal_value(data, expected):
     ['foo', 'bar', 'baz'],
 ])
 def test_to_internal_value_invalid(data):
-    print data
-
     with pytest.raises(ValidationError):
         BooleanField().to_internal_value(data)
