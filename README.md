@@ -7,15 +7,16 @@ Cornflake is a serialization library based on [Django REST Framework](http://www
 ## Usage
 
 ```python
-from cornflake.fields import StringField, DateField, ValidationError
-from cornflake.serializers import Serializer
+from cornflake import fields
+from cornflake import serializers
+from cornflake.exceptions import ValidationError
 from cornflake.validators import not_empty, not_in_future
 
-class PatientSerializer(Serializer):
-    first_name = StringField(validators=[not_empty()])
-    last_name = StringField(validators=[not_empty()])
-    birth_date = DateField(validators=[not_in_future()])
-    death_date = DateField(default=None)
+class PatientSerializer(serializers.Serializer):
+    first_name = fields.StringField(validators=[not_empty()])
+    last_name = fields.StringField(validators=[not_empty()])
+    birth_date = fields.DateField(validators=[not_in_future()])
+    death_date = fields.DateField(default=None)
 
     def validate_first_name(self, value):
         if value.upper() == 'TEST':
