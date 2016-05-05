@@ -27,9 +27,10 @@ def test_to_internal_value(data, expected):
 
 @pytest.mark.parametrize('data', [
     '1,2,3',
-    [1, 2, 3],
     123,
     123.456,
+    True,
+    False,
     {'foo': 1, 'bar': 2},
     ['foo', 'bar', 'baz'],
 ])
