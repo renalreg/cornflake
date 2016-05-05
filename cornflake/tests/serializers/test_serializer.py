@@ -129,6 +129,25 @@ def test_field_error():
     }
 
 
+def test_nested_error():
+    class FooSerializer(Serializer):
+        foo = fields.IntegerField()
+
+    class BarSerializer(Serializer):
+        foo = FooSerializer()
+
+    serializer = BarSerializer()
+
+    with pytest.raises(ValidationError) as e:
+        serializer.run_validation({'foo': {'foo': 'bar'}})
+
+    assert e.value.errors == {
+        'foo': {
+            'foo': ['A valid integer is required.']
+        }
+    }
+
+
 def test_is_valid():
     class FooSerializer(Serializer):
         foo = fields.IntegerField()
