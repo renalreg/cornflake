@@ -30,7 +30,7 @@ class Field(object):
         instance._kwargs = kwargs
         return instance
 
-    def __init__(self, source=None, read_only=False, write_only=False, required=None, default=None, validators=None, null=None, error_messages=None):
+    def __init__(self, source=None, read_only=False, write_only=False, required=None, default=None, validators=None, null=None, error_messages=None, initial=None):
         # Keep track of field declaration order
         self._creation_counter = Field._creation_counter
         Field._creation_counter += 1
@@ -56,6 +56,7 @@ class Field(object):
         self.write_only = write_only
         self.validators = validators
         self.null = null
+        self.initial = initial
 
         messages = dict()
 
@@ -110,6 +111,14 @@ class Field(object):
             default = default()
 
         return default
+
+    def get_initial(self):
+        initial = self.initial
+
+        if callable(initial):
+            initial = initial()
+
+        return initial
 
     def to_representation(self, value):
         raise NotImplementedError

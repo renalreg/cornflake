@@ -260,7 +260,7 @@ def test_data():
 
     serializer = FooSerializer(data={'foo': 'hello'})
     assert not serializer.is_valid()
-    assert serializer.data == {}
+    assert serializer.data == {'foo': None}
 
     serializer = FooSerializer(instance, data={'foo': 'hello'})
     assert not serializer.is_valid()

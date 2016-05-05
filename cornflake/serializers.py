@@ -54,7 +54,7 @@ class BaseSerializer(Field):
         elif self.validated_data:
             data = self.to_representation(self.validated_data)
         else:
-            data = {}
+            data = self.to_representation(self.get_initial())
 
         return data
 
@@ -139,7 +139,7 @@ class SerializerMetaclass(type):
                 fields = _merge_fields(fields, base_fields)
             else:
                 # Copy fields from mixins
-                mixin_fields = SerializerMetaclass.get_mixin_fields(serializer_class)
+                mixin_fields = cls.get_mixin_fields(serializer_class)
                 fields = _merge_fields(fields, mixin_fields)
 
         return fields
@@ -149,7 +149,7 @@ class SerializerMetaclass(type):
         base_fields = []
 
         for base_mixin_klass in reversed(mixin_klass.__bases__):
-            base_fields = _merge_fields(base_fields, SerializerMetaclass.get_mixin_fields(base_mixin_klass))
+            base_fields = _merge_fields(base_fields, cls.get_mixin_fields(base_mixin_klass))
 
         attr_fields = []
 
@@ -170,6 +170,14 @@ class Serializer(BaseSerializer):
     error_messages = {
         'not_a_dict': 'Expected an object.'
     }
+
+    def get_initial(self):
+        data = {}
+
+        for field in self.readable_fields:
+            data[field.field_name] = field.get_initial()
+
+        return data
 
     def get_fields(self):
         return copy.deepcopy(self._declared_fields)
@@ -199,6 +207,11 @@ class Serializer(BaseSerializer):
         ]
 
     def run_validation(self, data):
+        (is_empty, data) = self.validate_empty_values(data)
+
+        if is_empty:
+            return data
+
         value = self.to_internal_value(data)
 
         try:
@@ -299,7 +312,7 @@ class Serializer(BaseSerializer):
 class ListSerializer(BaseSerializer):
     child = None
 
-    default_error_messages = {
+    error_messages = {
         'not_a_list': 'Expected a list.'
     }
 
@@ -309,7 +322,15 @@ class ListSerializer(BaseSerializer):
         super(ListSerializer, self).__init__(*args, **kwargs)
         self.child.bind(self)
 
+    def get_initial(self):
+        return []
+
     def run_validation(self, data):
+        (is_empty, data) = self.validate_empty_values(data)
+
+        if is_empty:
+            return data
+
         value = self.to_internal_value(data)
 
         try:
