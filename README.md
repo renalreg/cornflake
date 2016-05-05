@@ -4,13 +4,12 @@
 
 Cornflake is a serialization library based on [Django REST Framework](http://www.django-rest-framework.org/).
 
-```python
-# example.py
+## Usage
 
+```python
 from cornflake.fields import StringField, DateField, ValidationError
 from cornflake.serializers import Serializer
 from cornflake.validators import not_empty, not_in_future
-
 
 class PatientSerializer(Serializer):
     first_name = StringField(validators=[not_empty()])
@@ -39,7 +38,6 @@ class PatientSerializer(Serializer):
 
         return instance
 
-
 class Patient(object):
     def __init__(self, first_name, last_name, birth_date, death_date):
         self.first_name = first_name
@@ -48,26 +46,45 @@ class Patient(object):
         self.death_date = death_date
 ```
 
+Create a patient:
+
 ```python
->>> from example import Patient, PatientSerializer
->>> # Create a patient
 >>> serializer = PatientSerializer(data={'first_name': 'John', 'last_name': 'Smith', 'birth_date': '2001-02-03'})
 >>> serializer.is_valid()
 True
 >>> patient = serializer.save()
->>> # Update a patient
+```
+
+Update a patient:
+
+```python
 >>> serializer = PatientSerializer(patient, data={'first_name': 'John', 'last_name': 'Smith', 'birth_date': '2001-02-03', 'death_date': '2016-01-01'})
 >>> serializer.is_valid()
 True
 >>> patient = serializer.save()
->>> # Serialize a patient
+```
+
+Serialize a patient:
+
+```python
 >>> serializer = PatientSerializer(patient)
 >>> serializer.data
 {'birth_date': '2001-02-03', 'first_name': u'John', 'last_name': u'Smith', 'death_date': '2016-01-01'}
->>> # Errors
+```
+
+Deserialize a patient with errors:
+
+```python
 >>> serializer = PatientSerializer(data={'first_name': 'TEST', 'last_name': 'Smith', 'birth_date': '2001-02-03'})
 >>> serializer.is_valid()
 False
 >>> serializer.errors
 {'first_name': ['No test patients please.']}
+```
+
+## Testing
+
+```
+pip install tox
+tox
 ```
