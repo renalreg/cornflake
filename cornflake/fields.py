@@ -94,7 +94,7 @@ class Field(object):
                 instance = getattr(instance, self.source)
         except (AttributeError, KeyError) as e:
             if not self.required:
-                raise SkipField()
+                raise SkipField
 
             raise e
 
@@ -346,7 +346,7 @@ class ListField(Field):
 
         for i, x in enumerate(data):
             try:
-                value = self.child.to_internal_value(x)
+                value = self.child.run_validation(x)
             except ValidationError as e:
                 errors[i] = e.errors
             else:
@@ -361,7 +361,10 @@ class ListField(Field):
         data = []
 
         for value in values:
-            data.append(self.child.to_representation(value))
+            if value is None:
+                data.append(None)
+            else:
+                data.append(self.child.to_representation(value))
 
         return data
 
@@ -396,13 +399,23 @@ class CommaSeparatedField(Field):
         values = []
 
         for part in parts:
-            value = self.child.to_internal_value(part)
+            value = self.child.run_validation(part)
             values.append(value)
 
         return values
 
     def to_representation(self, values):
-        return ','.join(six.text_type(self.child.to_representation(value)) for value in values)
+        data = []
+
+        for value in values:
+            if value is None:
+                data.append(None)
+            else:
+                data.append(six.text_type(self.child.to_representation(value)))
+
+        data = ','.join(data)
+
+        return data
 
 
 class UUIDField(Field):

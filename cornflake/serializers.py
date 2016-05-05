@@ -78,7 +78,12 @@ class BaseSerializer(Field):
         return self.instance
 
 
-def merge_fields(a, b):
+def _merge_fields(a, b):
+    """Merge two lists of fields.
+
+    Fields in `b` override fields in `a`. Fields in `a` are output first.
+    """
+
     a_names = set(x[0] for x in a)
     b_names = set(x[0] for x in b)
     a_keep = a_names - b_names
@@ -104,7 +109,7 @@ class SerializerMetaclass(type):
         base_fields = cls.get_base_fields(bases)
         attr_fields = cls.get_attr_fields(attrs)
 
-        fields = merge_fields(base_fields, attr_fields)
+        fields = _merge_fields(base_fields, attr_fields)
 
         return OrderedDict(fields)
 
@@ -131,31 +136,31 @@ class SerializerMetaclass(type):
             if hasattr(serializer_class, '_declared_fields'):
                 # Copy fields from base
                 base_fields = list(serializer_class._declared_fields.items())
-                fields = merge_fields(fields, base_fields)
+                fields = _merge_fields(fields, base_fields)
             else:
                 # Copy fields from mixins
                 mixin_fields = SerializerMetaclass.get_mixin_fields(serializer_class)
-                fields = merge_fields(fields, mixin_fields)
+                fields = _merge_fields(fields, mixin_fields)
 
         return fields
 
     @classmethod
     def get_mixin_fields(cls, mixin_klass):
-        fields = []
+        base_fields = []
 
         for base_mixin_klass in reversed(mixin_klass.__bases__):
-            fields = merge_fields(fields, SerializerMetaclass.get_mixin_fields(base_mixin_klass))
+            base_fields = _merge_fields(base_fields, SerializerMetaclass.get_mixin_fields(base_mixin_klass))
 
-        own_fields = []
+        attr_fields = []
 
         for name, field in mixin_klass.__dict__.items():
             if isinstance(field, Field):
-                own_fields.append((name, field))
+                attr_fields.append((name, field))
 
         # Sort the fields in the order they were declared
-        own_fields.sort(key=lambda x: x[1]._creation_counter)
+        attr_fields.sort(key=lambda x: x[1]._creation_counter)
 
-        fields = merge_fields(fields, own_fields)
+        fields = _merge_fields(base_fields, attr_fields)
 
         return fields
 
@@ -266,8 +271,6 @@ class Serializer(BaseSerializer):
                     field_value = validate_method(field_value)
             except ValidationError as e:
                 errors[field.field_name] = e.errors
-            except SkipField:
-                pass
             else:
                 value[field.source] = field_value
 
@@ -332,7 +335,7 @@ class ListSerializer(BaseSerializer):
 
         for i, x in enumerate(data):
             try:
-                value = self.child.to_internal_value(x)
+                value = self.child.run_validation(x)
             except ValidationError as e:
                 errors[i] = e.errors
             else:
@@ -347,7 +350,10 @@ class ListSerializer(BaseSerializer):
         data = []
 
         for value in values:
-            data.append(self.child.to_representation(value))
+            if value is None:
+                data.append(None)
+            else:
+                data.append(self.child.to_representation(value))
 
         return data
 

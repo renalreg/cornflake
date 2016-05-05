@@ -10,6 +10,7 @@ from cornflake.exceptions import ValidationError
 @pytest.mark.parametrize(('value', 'expected'), [
     ([], []),
     ([date(2016, 1, 1), date(2016, 1, 2)], ['2016-01-01', '2016-01-02']),
+    ([date(2016, 1, 1), None, date(2016, 1, 2)], ['2016-01-01', None, '2016-01-02']),
 ])
 def test_to_representation(value, expected):
     assert ListField(child=DateField()).to_representation(value) == expected
@@ -36,6 +37,16 @@ def test_to_internal_value(data, expected):
 def test_to_internal_value_invalid(data):
     with pytest.raises(ValidationError):
         ListField(child=DateField()).to_internal_value(data)
+
+
+def test_none():
+    i = ['2016-01-01', None, '2016-01-02']
+    o = [date(2016, 1, 1), None, date(2016, 1, 2)]
+
+    with pytest.raises(ValidationError):
+        ListField(child=DateField(null=False)).to_internal_value(i)
+
+    assert ListField(child=DateField(null=True)).to_internal_value(i) == o
 
 
 def test_string_field():

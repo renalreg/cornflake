@@ -7,51 +7,43 @@ from cornflake import fields
 from cornflake.exceptions import ValidationError, SkipField
 
 
-class TagField(fields.Field):
-    def __init__(self, tag, **kwargs):
-        super(TagField, self).__init__(**kwargs)
-        self.tag = tag
-
-
-class FooSerializer(Serializer):
-    foo = TagField('foo_foo')
-    bar = TagField('foo_bar')
-    baz = TagField('foo_baz')
-
-
-class BarSerializer(Serializer):
-    hello = TagField('bar_hello')
-    bar = TagField('bar_bar')
-
-
-class QuxMixin(object):
-    qux = TagField('qux_qux')
-    norf = TagField('qux_norf')
-
-
-class XMixin(object):
-    x = TagField('x_x')
-    y = TagField('x_y')
-    z = TagField('x_z')
-    norf = TagField('x_norf')
-
-
-class YMixin(object):
-    y = TagField('y_y')
-    z = TagField('y_z')
-    norf = TagField('y_norf')
-
-
-class NorfMixin(YMixin, XMixin):
-    norf = TagField('norf_norf')
-
-
-class BazSerializer(NorfMixin, BarSerializer, QuxMixin, FooSerializer):
-    baz = TagField('baz_baz')
-    world = TagField('baz_world')
-
-
 def test_fields():
+    class TagField(fields.Field):
+        def __init__(self, tag, **kwargs):
+            super(TagField, self).__init__(**kwargs)
+            self.tag = tag
+
+    class FooSerializer(Serializer):
+        foo = TagField('foo_foo')
+        bar = TagField('foo_bar')
+        baz = TagField('foo_baz')
+
+    class BarSerializer(Serializer):
+        hello = TagField('bar_hello')
+        bar = TagField('bar_bar')
+
+    class QuxMixin(object):
+        qux = TagField('qux_qux')
+        norf = TagField('qux_norf')
+
+    class XMixin(object):
+        x = TagField('x_x')
+        y = TagField('x_y')
+        z = TagField('x_z')
+        norf = TagField('x_norf')
+
+    class YMixin(object):
+        y = TagField('y_y')
+        z = TagField('y_z')
+        norf = TagField('y_norf')
+
+    class NorfMixin(YMixin, XMixin):
+        norf = TagField('norf_norf')
+
+    class BazSerializer(NorfMixin, BarSerializer, QuxMixin, FooSerializer):
+        baz = TagField('baz_baz')
+        world = TagField('baz_world')
+
     serializer = BazSerializer()
 
     expected = [
@@ -67,10 +59,10 @@ def test_fields():
         ('world', 'baz_world'),
     ]
 
-    fields = serializer.fields
+    serializer_fields = serializer.fields
 
-    assert fields.keys() == [x[0] for x in expected]
-    assert [(x.field_name, x.tag) for x in fields.values()] == expected
+    assert serializer_fields.keys() == [x[0] for x in expected]
+    assert [(x.field_name, x.tag) for x in serializer_fields.values()] == expected
 
     for name, tag in expected:
         field = getattr(serializer, name)
@@ -212,3 +204,64 @@ def test_context():
     assert serializer.data == {
         'foo': {'foo': 'Hello!'}
     }
+
+
+@pytest.mark.parametrize(('data', 'expected'), [
+    ({'foo': 1}, {'foo': 1}),
+    ({'foo': '1'}, {'foo': 1}),
+    ({'foo': 1, 'bar': 1}, {'foo': 1}),  # removes extra values
+])
+def test_to_internal_value(data, expected):
+    class FooSerializer(Serializer):
+        foo = fields.IntegerField()
+
+    serializer = FooSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data == expected
+    assert serializer.to_internal_value(data) == expected
+
+
+@pytest.mark.parametrize('data', [
+    {},
+    [],
+    True,
+    False,
+    123,
+    123.456
+])
+def test_to_internal_value_invalid(data):
+    class FooSerializer(Serializer):
+        foo = fields.IntegerField()
+
+    serializer = FooSerializer(data=data)
+    assert not serializer.is_valid()
+    assert serializer.errors
+    assert serializer.validated_data == {}
+
+    with pytest.raises(ValidationError):
+        serializer.to_internal_value(data)
+
+
+def test_data():
+    class FooSerializer(Serializer):
+        foo = fields.DateField()
+
+    data = {'foo': '2001-02-03'}
+    instance = {'foo': date(2001, 02, 03)}
+
+    serializer = FooSerializer(instance)
+    assert serializer.data == data
+
+    serializer = FooSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data == instance
+    assert serializer.initial_data == data
+    assert serializer.data == data
+
+    serializer = FooSerializer(data={'foo': 'hello'})
+    assert not serializer.is_valid()
+    assert serializer.data == {}
+
+    serializer = FooSerializer(instance, data={'foo': 'hello'})
+    assert not serializer.is_valid()
+    assert serializer.data == data
