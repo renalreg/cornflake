@@ -70,3 +70,16 @@ def test_error():
     assert serializer.errors == {
         1: {'foo': ['Invalid date format.']}
     }
+
+
+def test_validate_error():
+    class FooListSerializer(ListSerializer):
+        child = FooSerializer()
+
+        def validate(self, data):
+            raise ValidationError('Uh oh!')
+
+    serializer = FooListSerializer(data=[])
+
+    assert not serializer.is_valid()
+    assert serializer.errors == {'_': ['Uh oh!']}
