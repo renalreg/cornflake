@@ -76,10 +76,17 @@ def test_validate_error():
     class FooListSerializer(ListSerializer):
         child = FooSerializer()
 
+        def __init__(self, message, **kwargs):
+            super(FooListSerializer, self).__init__(**kwargs)
+            self.message = message
+
         def validate(self, data):
-            raise ValidationError('Uh oh!')
+            raise ValidationError(self.message)
 
-    serializer = FooListSerializer(data=[])
+    serializer = FooListSerializer('Uh oh!', data=[])
+    assert not serializer.is_valid()
+    assert serializer.errors == {'_': ['Uh oh!']}
 
+    serializer = FooListSerializer({'_': 'Uh oh!'}, data=[])
     assert not serializer.is_valid()
     assert serializer.errors == {'_': ['Uh oh!']}
