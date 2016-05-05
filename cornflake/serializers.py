@@ -78,51 +78,87 @@ class BaseSerializer(Field):
         return self.instance
 
 
+def merge_fields(a, b):
+    a_names = set(x[0] for x in a)
+    b_names = set(x[0] for x in b)
+    a_keep = a_names - b_names
+
+    fields = []
+
+    for name, field in a:
+        if name in a_keep:
+            fields.append((name, field))
+
+    fields.extend(b)
+
+    return fields
+
+
 class SerializerMetaclass(type):
     def __new__(cls, name, bases, attrs):
-        attrs['_declared_fields'] = SerializerMetaclass.get_fields(bases, attrs)
+        attrs['_declared_fields'] = cls.get_fields(bases, attrs)
         return super(SerializerMetaclass, cls).__new__(cls, name, bases, attrs)
 
-    @staticmethod
-    def get_fields(bases, attrs):
+    @classmethod
+    def get_fields(cls, bases, attrs):
+        base_fields = cls.get_base_fields(bases)
+        attr_fields = cls.get_attr_fields(attrs)
+
+        print cls, 'base', base_fields
+        print cls, 'attr', attr_fields
+
+        fields = merge_fields(base_fields, attr_fields)
+
+        return OrderedDict(fields)
+
+    @classmethod
+    def get_attr_fields(cls, attrs):
         fields = []
 
         # Get the fields declared on this class
-        for field_name, obj in list(attrs.items()):
-            if isinstance(obj, Field):
-                fields.append((field_name, attrs.pop(field_name)))
+        for name, field in list(attrs.items()):
+            if isinstance(field, Field):
+                fields.append((name, field))
 
         # Sort the fields in the order they were declared
         fields.sort(key=lambda x: x[1]._creation_counter)
 
+        return fields
+
+    @classmethod
+    def get_base_fields(cls, bases):
+        fields = []
+
         # Loop in reverse to maintain correct field ordering
         for serializer_class in reversed(bases):
             if hasattr(serializer_class, '_declared_fields'):
-                # Copy fields from another serializer
-                # Parent serializer's fields go first
-                fields = list(serializer_class._declared_fields.items()) + fields
+                # Copy fields from base
+                base_fields = list(serializer_class._declared_fields.items())
+                fields = merge_fields(fields, base_fields)
             else:
                 # Copy fields from mixins
-                mixin_fields = SerializerMetaclass.get_mixin_fields(serializer_class).items()
+                mixin_fields = SerializerMetaclass.get_mixin_fields(serializer_class)
+                fields = merge_fields(fields, mixin_fields)
 
-                # Sort the mixin fields in the order they were declared
-                mixin_fields.sort(key=lambda x: x[1]._creation_counter)
+        return fields
 
-                # Add the mixin fields
-                fields = mixin_fields + fields
+    @classmethod
+    def get_mixin_fields(cls, mixin_klass):
+        fields = []
 
-        return OrderedDict(fields)
+        for base_mixin_klass in reversed(mixin_klass.__bases__):
+            fields = merge_fields(fields, SerializerMetaclass.get_mixin_fields(base_mixin_klass))
 
-    @staticmethod
-    def get_mixin_fields(field_class):
-        fields = {}
+        own_fields = []
 
-        for field_mixin_klass in reversed(field_class.__bases__):
-            fields.update(SerializerMetaclass.get_mixin_fields(field_mixin_klass))
+        for name, field in mixin_klass.__dict__.items():
+            if isinstance(field, Field):
+                own_fields.append((name, field))
 
-        for field_name, obj in field_class.__dict__.items():
-            if isinstance(obj, Field):
-                fields[field_name] = obj
+        # Sort the fields in the order they were declared
+        own_fields.sort(key=lambda x: x[1]._creation_counter)
+
+        fields = merge_fields(fields, own_fields)
 
         return fields
 
