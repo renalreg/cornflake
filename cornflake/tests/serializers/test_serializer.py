@@ -1,8 +1,13 @@
+from datetime import date
+
+import pytest
+
 from cornflake.serializers import Serializer
-from cornflake.fields import Field
+from cornflake import fields
+from cornflake.exceptions import ValidationError, SkipField
 
 
-class TagField(Field):
+class TagField(fields.Field):
     def __init__(self, tag, **kwargs):
         super(TagField, self).__init__(**kwargs)
         self.tag = tag
@@ -71,3 +76,139 @@ def test_fields():
         field = getattr(serializer, name)
         assert field.tag == tag
         assert field.field_name == name
+
+
+def test_validate_error():
+    class FooSerializer(Serializer):
+        def __init__(self, message):
+            super(FooSerializer, self).__init__()
+            self.message = message
+
+        def validate(self, data):
+            raise ValidationError(self.message)
+
+    serializer = FooSerializer('Uh oh!')
+
+    with pytest.raises(ValidationError) as e:
+        serializer.run_validation({})
+
+    assert e.value.errors == {
+        '_': ['Uh oh!']
+    }
+
+    serializer = FooSerializer({'_': 'Uh oh!'})
+
+    with pytest.raises(ValidationError) as e:
+        serializer.run_validation({})
+
+    assert e.value.errors == {
+        '_': ['Uh oh!']
+    }
+
+
+def test_validate_field_error():
+    class FooSerializer(Serializer):
+        foo = fields.StringField()
+
+        def validate_foo(self, foo):
+            raise ValidationError('Uh oh!')
+
+    serializer = FooSerializer()
+
+    with pytest.raises(ValidationError) as e:
+        serializer.run_validation({'foo': 'bar'})
+
+    assert e.value.errors == {
+        'foo': ['Uh oh!']
+    }
+
+
+def test_field_error():
+    class FooSerializer(Serializer):
+        foo = fields.IntegerField()
+
+    serializer = FooSerializer()
+
+    with pytest.raises(ValidationError) as e:
+        serializer.run_validation({'foo': 'bar'})
+
+    assert e.value.errors == {
+        'foo': ['A valid integer is required.']
+    }
+
+
+def test_is_valid():
+    class FooSerializer(Serializer):
+        foo = fields.IntegerField()
+
+    serializer = FooSerializer(data={'foo': 1})
+
+    assert serializer.is_valid()
+
+    serializer = FooSerializer(data={'foo': 'bar'})
+
+    assert not serializer.is_valid()
+
+    assert serializer.errors == {
+        'foo': ['A valid integer is required.']
+    }
+
+    with pytest.raises(ValidationError) as e:
+        serializer.is_valid(raise_exception=True)
+
+    assert e.value.errors == {
+        'foo': ['A valid integer is required.']
+    }
+
+
+def test_to_representation():
+    class FooSerializer(Serializer):
+        foo = fields.DateField()
+
+    serializer = FooSerializer({'foo': date(2001, 2, 3)})
+
+    assert serializer.data == {'foo': '2001-02-03'}
+
+
+def test_to_representation_skip():
+    class FooField(fields.Field):
+        def get_attribute(self, instance):
+            raise SkipField
+
+    class FooSerializer(Serializer):
+        foo = FooField()
+
+    serializer = FooSerializer({'foo': 'bar'})
+
+    assert serializer.data == {}
+
+
+def test_to_representation_none():
+    class FooField(fields.Field):
+        def to_representation(self, value):
+            return 'fail!'
+
+    class FooSerializer(Serializer):
+        foo = FooField()
+
+    serializer = FooSerializer({'foo': None})
+
+    assert serializer.data == {'foo': None}
+
+
+def test_context():
+    class FooField(fields.Field):
+        def to_representation(self, value):
+            return self.context['message']
+
+    class FooSerializer(Serializer):
+        foo = FooField()
+
+    class BarSerializer(Serializer):
+        foo = FooSerializer()
+
+    serializer = BarSerializer({'foo': {'foo': 'bar'}}, context={'message': 'Hello!'})
+
+    assert serializer.data == {
+        'foo': {'foo': 'Hello!'}
+    }

@@ -104,9 +104,6 @@ class SerializerMetaclass(type):
         base_fields = cls.get_base_fields(bases)
         attr_fields = cls.get_attr_fields(attrs)
 
-        print cls, 'base', base_fields
-        print cls, 'attr', attr_fields
-
         fields = merge_fields(base_fields, attr_fields)
 
         return OrderedDict(fields)
