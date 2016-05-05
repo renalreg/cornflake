@@ -16,7 +16,7 @@ class PatientSerializer(serializers.Serializer):
     first_name = fields.StringField(validators=[not_empty()])
     last_name = fields.StringField(validators=[not_empty()])
     birth_date = fields.DateField(validators=[not_in_future()])
-    death_date = fields.DateField(default=None)
+    death_date = fields.DateField(required=False)
 
     def validate_first_name(self, value):
         if value.upper() == 'TEST':
