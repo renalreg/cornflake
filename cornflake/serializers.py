@@ -171,6 +171,10 @@ class Serializer(BaseSerializer):
         'not_a_dict': 'Expected an object.'
     }
 
+    def __init__(self, *args, **kwargs):
+        super(Serializer, self).__init__(*args, **kwargs)
+        self._fields = None
+
     def get_initial(self):
         data = {}
 
@@ -184,13 +188,16 @@ class Serializer(BaseSerializer):
 
     @property
     def fields(self):
-        fields = self.get_fields()
+        if self._fields is None:
+            fields = self.get_fields()
 
-        for field_name, field in fields.items():
-            field.bind(self, field_name)
-            setattr(self, field_name, field)
+            for field_name, field in fields.items():
+                field.bind(self, field_name)
+                setattr(self, field_name, field)
 
-        return fields
+            self._fields = fields
+
+        return self._fields
 
     @property
     def writable_fields(self):
