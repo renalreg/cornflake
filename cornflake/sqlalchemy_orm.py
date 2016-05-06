@@ -188,7 +188,7 @@ class ReferenceField(fields.Field):
     def get_field(self):
         return self.get_field_class()()
 
-    def bind(self, parent, field_name):
+    def bind(self, parent, field_name=None):
         super(ReferenceField, self).bind(parent, field_name)
         self.field.bind(self, field_name)
 
