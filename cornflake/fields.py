@@ -348,7 +348,12 @@ class ListField(Field):
     def __init__(self, *args, **kwargs):
         self.child = kwargs.pop('child', copy.deepcopy(self.child))
         assert self.child is not None
+
+        kwargs.setdefault('default', list)
+        kwargs.setdefault('null', False)
+
         super(ListField, self).__init__(*args, **kwargs)
+
         self.child.bind(self)
 
     def to_internal_value(self, data):

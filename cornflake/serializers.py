@@ -326,7 +326,12 @@ class ListSerializer(BaseSerializer):
     def __init__(self, *args, **kwargs):
         self.child = kwargs.pop('child', copy.deepcopy(self.child))
         assert self.child is not None
+
+        kwargs.setdefault('default', list)
+        kwargs.setdefault('null', False)
+
         super(ListSerializer, self).__init__(*args, **kwargs)
+
         self.child.bind(self)
 
     def get_initial(self):

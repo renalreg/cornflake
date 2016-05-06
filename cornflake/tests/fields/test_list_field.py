@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from cornflake.fields import ListField, DateField, StringField, IntegerField
+from cornflake.fields import ListField, DateField, StringField, IntegerField, empty
 from cornflake.serializers import Serializer
 from cornflake.exceptions import ValidationError
 
@@ -77,3 +77,14 @@ def test_serializer_errors():
         field.to_internal_value([{'foo': '123'}, {'foo': 'foo'}])
 
     assert e.value.errors == {1: {'foo': ['A valid integer is required.']}}
+
+
+def test_default():
+    field = ListField(required=False, child=IntegerField())
+
+    # Default should be an empty list
+    assert field.run_validation(empty) == []
+
+    # ListField doesn't allow None by default
+    with pytest.raises(ValidationError):
+        field.run_validation(None)

@@ -5,6 +5,7 @@ import pytest
 from cornflake import fields
 from cornflake.serializers import Serializer, ListSerializer
 from cornflake.exceptions import ValidationError
+from cornflake.fields import empty
 
 
 class FooSerializer(Serializer):
@@ -90,3 +91,14 @@ def test_validate_error():
     serializer = FooListSerializer({'_': 'Uh oh!'}, data=[])
     assert not serializer.is_valid()
     assert serializer.errors == {'_': ['Uh oh!']}
+
+
+def test_default():
+    field = ListSerializer(required=False, child=fields.IntegerField())
+
+    # Default should be an empty list
+    assert field.run_validation(empty) == []
+
+    # ListSerializer doesn't allow None by default
+    with pytest.raises(ValidationError):
+        field.run_validation(None)
