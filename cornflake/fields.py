@@ -398,7 +398,12 @@ class CommaSeparatedField(Field):
     def __init__(self, **kwargs):
         self.child = kwargs.pop('child', copy.deepcopy(self.child))
         assert self.child is not None
+
+        kwargs.setdefault('default', list)
+        kwargs.setdefault('null', False)
+
         super(CommaSeparatedField, self).__init__(**kwargs)
+
         self.child.bind(self)
 
     def to_internal_value(self, data):
