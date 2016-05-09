@@ -85,7 +85,7 @@ False
 {'first_name': ['No test patients please.']}
 ```
 
-## Testing
+## Tests
 
 Run tests with the `tox` command:
 
