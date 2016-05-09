@@ -214,7 +214,6 @@ class Serializer(BaseSerializer):
 
             for field_name, field in fields.items():
                 field.bind(self, field_name)
-                setattr(self, field_name, field)
 
             self._fields = fields
 
@@ -259,7 +258,8 @@ class Serializer(BaseSerializer):
     def validate(self, value):
         return value
 
-    def run_validators_on_field(self, data, field, validators):
+    def run_validators_on_field(self, data, field_name, validators):
+        field = self.fields[field_name]
         value = field.get_attribute(data)
 
         try:
