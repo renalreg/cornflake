@@ -87,7 +87,7 @@ False
 
 ## Testing
 
-Run tests with `tox`:
+Run tests with the `tox` command:
 
 ```
 pip install tox
