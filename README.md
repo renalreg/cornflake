@@ -6,6 +6,8 @@ Cornflake is a serialization library inspired by [Django REST Framework](http://
 
 ## Usage
 
+First we create a serializer (`PatientSerializer`) and a class to test it with (`Patient`):
+
 ```python
 from cornflake import fields
 from cornflake import serializers
@@ -47,7 +49,7 @@ class Patient(object):
         self.death_date = death_date
 ```
 
-Create a patient:
+Now we can create a patient:
 
 ```python
 >>> serializer = PatientSerializer(data={'first_name': 'John', 'last_name': 'Smith', 'birth_date': '2001-02-03'})
@@ -56,7 +58,7 @@ True
 >>> patient = serializer.save()
 ```
 
-Update a patient:
+Update the patient with new data:
 
 ```python
 >>> serializer = PatientSerializer(patient, data={'first_name': 'John', 'last_name': 'Smith', 'birth_date': '2001-02-03', 'death_date': '2016-01-01'})
@@ -65,7 +67,7 @@ True
 >>> patient = serializer.save()
 ```
 
-Serialize a patient:
+Serialize the patient to use in an API response:
 
 ```python
 >>> serializer = PatientSerializer(patient)
@@ -73,7 +75,7 @@ Serialize a patient:
 {'birth_date': '2001-02-03', 'first_name': u'John', 'last_name': u'Smith', 'death_date': '2016-01-01'}
 ```
 
-Deserialize a patient with errors:
+Deserialize, validate and report errors:
 
 ```python
 >>> serializer = PatientSerializer(data={'first_name': 'TEST', 'last_name': 'Smith', 'birth_date': '2001-02-03'})
@@ -84,6 +86,8 @@ False
 ```
 
 ## Testing
+
+Run tests with `tox`:
 
 ```
 pip install tox
