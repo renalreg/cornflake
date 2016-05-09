@@ -8,7 +8,7 @@ from cornflake.exceptions import ValidationError, SkipField
 
 
 class BaseSerializer(Field):
-    def __init__(self, instance=None, data=None, **kwargs):
+    def __init__(self, instance=None, data=None, partial=False, **kwargs):
         meta = getattr(self, 'Meta', None)
 
         if meta is not None:
@@ -21,10 +21,11 @@ class BaseSerializer(Field):
 
         super(BaseSerializer, self).__init__(**kwargs)
 
+        self.instance = instance
+
         if data is None:
             data = {}
 
-        self.instance = instance
         self.initial_data = data
 
         if context is not None:
@@ -33,9 +34,22 @@ class BaseSerializer(Field):
         self.errors = {}
         self.validated_data = {}
 
+        # Instance is required for partial updates
+        assert not (partial and instance is None)
+
+        self.partial = partial
+
+    def get_partial(self):
+        raise NotImplementedError
+
     def is_valid(self, raise_exception=False):
+        if self.partial:
+            data = self.get_partial()
+        else:
+            data = self.initial_data
+
         try:
-            self.validated_data = self.run_validation(self.initial_data)
+            self.validated_data = self.run_validation(data)
         except ValidationError as e:
             self.validated_data = {}
             self.errors = e.errors
@@ -182,6 +196,13 @@ class Serializer(BaseSerializer):
             data[field.field_name] = field.get_initial()
 
         return data
+
+    def get_partial(self):
+        return dict(
+            self.get_initial().items() +
+            self.data.items() +
+            self.initial_data.items()
+        )
 
     def get_fields(self):
         return copy.deepcopy(self._declared_fields)
@@ -395,6 +416,11 @@ class ListSerializer(BaseSerializer):
 
 
 class ProxySerializer(BaseSerializer):
+    def get_partial(self):
+        serializer = self.get_external_serializer(self.initial_data)
+        serializer.bind(self)
+        return serializer.get_partial()
+
     def get_internal_serializer(self, data):
         raise NotImplementedError
 
