@@ -33,7 +33,7 @@ class ModelSerializer(serializers.Serializer):
 
         model_fields = getattr(self.Meta, 'fields', None)
 
-        if model_fields:
+        if model_fields is not None:
             model_fields = set(model_fields)
 
         return model_fields
@@ -81,7 +81,7 @@ class ModelSerializer(serializers.Serializer):
                 continue
 
             # Not in field list
-            if model_fields and key not in model_fields:
+            if model_fields is not None and key not in model_fields:
                 continue
 
             # Field excluded
