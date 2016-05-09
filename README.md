@@ -6,7 +6,7 @@ Cornflake is a serialization library inspired by [Django REST Framework](http://
 
 ## Usage
 
-First we create a serializer (`PatientSerializer`) and a class to test it with (`Patient`):
+First we create a serializer and a class to test it with:
 
 ```python
 from cornflake import fields
