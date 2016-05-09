@@ -64,11 +64,6 @@ def test_fields():
     assert serializer_fields.keys() == [x[0] for x in expected]
     assert [(x.field_name, x.tag) for x in serializer_fields.values()] == expected
 
-    for name, tag in expected:
-        field = getattr(serializer, name)
-        assert field.tag == tag
-        assert field.field_name == name
-
 
 def test_validate_error():
     class FooSerializer(Serializer):

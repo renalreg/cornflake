@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 import six
 
-from cornflake.fields import Field, empty
+from cornflake.fields import Field
 from cornflake.exceptions import ValidationError, SkipField
 
 
