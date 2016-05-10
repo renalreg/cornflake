@@ -314,7 +314,7 @@ class DateField(Field):
 class DateTimeField(Field):
     error_messages = {
         'invalid': 'Invalid date format.',
-        'date': 'Expected a date but got a datetime.',
+        'date': 'Expected a datetime but got a date.',
     }
 
     def to_internal_value(self, data):
