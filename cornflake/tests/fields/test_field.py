@@ -6,14 +6,6 @@ from cornflake.fields import Field, empty
 from cornflake.exceptions import ValidationError, SkipField
 
 
-class BasicField(Field):
-    def to_internal_value(self, data):
-        return data
-
-    def to_representation(self, value):
-        return value
-
-
 def test_root():
     class Node(object):
         def __init__(self, parent=None):
@@ -102,6 +94,8 @@ def test_get_attribute():
     field = Field()
     field.bind(None, 'b')
 
+    field.required = True
+
     with pytest.raises(AttributeError):
         field.get_attribute(o)
 
@@ -118,9 +112,9 @@ def test_get_attribute():
 
 
 def test_default():
-    field = BasicField(default='foo')
+    field = Field(default='foo')
     assert field.run_validation('bar') == 'bar'
-    assert field.run_validation(None) is None
+    assert field.run_validation(None) == 'foo'
     assert field.run_validation(empty) == 'foo'
 
 
@@ -131,16 +125,16 @@ def test_default_callable():
 
     f.counter = 0
 
-    field = BasicField(default=f)
+    field = Field(default=f)
 
     assert field.run_validation('bar') == 'bar'
-    assert field.run_validation(None) is None
-    assert field.run_validation(empty) == 1
+    assert field.run_validation(None) == 1
     assert field.run_validation(empty) == 2
+    assert field.run_validation(empty) == 3
 
 
 def test_required():
-    field = BasicField(required=True)
+    field = Field(required=True)
 
     assert field.run_validation(123) == 123
 
@@ -152,39 +146,31 @@ def test_required():
 
 
 def test_optional():
-    field = BasicField(required=False)
+    field = Field(required=False)
 
     assert field.run_validation(123) == 123
     assert field.run_validation(None) is None
     assert field.run_validation(empty) is None
 
 
-def test_null():
-    field = BasicField(null=True)
-    assert field.run_validation(None) is None
-
-    field = BasicField(null=False)
-
-    with pytest.raises(ValidationError):
-        field.run_validation(None)
-
-
 def test_to_representation():
+    x = object()
+
     field = Field()
 
-    with pytest.raises(NotImplementedError):
-        field.to_representation(123)
+    assert field.to_representation(x) is x
 
 
 def test_to_internal_value():
+    x = object()
+
     field = Field()
 
-    with pytest.raises(NotImplementedError):
-        field.to_internal_value(123)
+    assert field.to_internal_value(x) is x
 
 
 def test_validators():
-    field = BasicField(validators=[lambda x: 2 * x, lambda x: x + 1])
+    field = Field(validators=[lambda x: 2 * x, lambda x: x + 1])
     assert field.run_validation(2) == 5
 
 
@@ -192,7 +178,7 @@ def test_validators_error():
     def error(value):
         raise ValidationError('Uh oh!')
 
-    field = BasicField(validators=[error])
+    field = Field(validators=[error])
 
     with pytest.raises(ValidationError):
         field.run_validation(123)
@@ -202,7 +188,7 @@ def test_validators_skip():
     def skip(value):
         raise SkipField
 
-    field = BasicField(validators=[lambda x: x + 1, skip])
+    field = Field(validators=[lambda x: x + 1, skip])
 
     assert field.run_validation(1) == 2
 
@@ -218,7 +204,7 @@ def test_set_context():
         def set_context(self, parent):
             self.parent = parent
 
-    field = BasicField(validators=[f()])
+    field = Field(validators=[f()])
     field.foo = 'bar'
 
     assert field.run_validation(123) == 'bar'

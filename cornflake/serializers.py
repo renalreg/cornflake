@@ -234,9 +234,9 @@ class Serializer(BaseSerializer):
         ]
 
     def run_validation(self, data):
-        (is_empty, data) = self.validate_empty_values(data)
+        data = self.validate_empty_values(data)
 
-        if is_empty:
+        if data is None:
             return data
 
         value = self.to_internal_value(data)
@@ -349,7 +349,6 @@ class ListSerializer(BaseSerializer):
         assert self.child is not None
 
         kwargs.setdefault('default', list)
-        kwargs.setdefault('null', False)
 
         super(ListSerializer, self).__init__(*args, **kwargs)
 
@@ -359,9 +358,9 @@ class ListSerializer(BaseSerializer):
         return []
 
     def run_validation(self, data):
-        (is_empty, data) = self.validate_empty_values(data)
+        data = self.validate_empty_values(data)
 
-        if is_empty:
+        if data is None:
             return data
 
         value = self.to_internal_value(data)

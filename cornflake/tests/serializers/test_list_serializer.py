@@ -53,9 +53,9 @@ def test_none():
     o = [{'foo': date(2016, 1, 1)}, None, {'foo': date(2016, 1, 2)}]
 
     with pytest.raises(ValidationError):
-        ListSerializer(child=FooSerializer(null=False)).to_internal_value(i)
+        ListSerializer(child=FooSerializer(required=True)).to_internal_value(i)
 
-    assert ListSerializer(child=FooSerializer(null=True)).to_internal_value(i) == o
+    assert ListSerializer(child=FooSerializer(required=False)).to_internal_value(i) == o
 
 
 def test_error():
@@ -64,7 +64,7 @@ def test_error():
         {'foo': 'hello'},
     ]
 
-    serializer = ListSerializer(child=FooSerializer(null=True), data=data)
+    serializer = ListSerializer(child=FooSerializer(), data=data)
 
     assert not serializer.is_valid()
 
@@ -98,7 +98,4 @@ def test_default():
 
     # Default should be an empty list
     assert field.run_validation(empty) == []
-
-    # ListSerializer doesn't allow None by default
-    with pytest.raises(ValidationError):
-        field.run_validation(None)
+    assert field.run_validation(None) == []

@@ -21,7 +21,6 @@ class Field(object):
 
     error_messages = {
         'required': 'This field is required.',
-        'null': 'This field may not be null.'
     }
 
     def __new__(cls, *args, **kwargs):
@@ -31,9 +30,11 @@ class Field(object):
         return instance
 
     def __init__(
-        self, source=None, read_only=False,
-        write_only=False, required=None, default=None,
-        validators=None, null=None, error_messages=None,
+        self,
+        source=None,
+        read_only=False, write_only=False,
+        required=None, default=None, default_empty=empty,
+        validators=None, error_messages=None,
         initial=None
     ):
         # Keep track of field declaration order
@@ -41,12 +42,10 @@ class Field(object):
         Field._creation_counter += 1
 
         if required is None:
-            # Required if no default supplied and the field is writable
-            required = default is None and not read_only
+            required = not read_only
 
-        if null is None:
-            # Allow nulls when the field is optional
-            null = not required
+        if default_empty is empty:
+            default_empty = default
 
         if validators is None:
             validators = list()
@@ -57,10 +56,10 @@ class Field(object):
         self.source = source
         self.required = required
         self.default = default
+        self.default_empty = default_empty
         self.read_only = read_only
         self.write_only = write_only
         self.validators = validators
-        self.null = null
         self.initial = initial
 
         messages = dict()
@@ -109,8 +108,11 @@ class Field(object):
     def get_value(self, data):
         return data.get(self.field_name, empty)
 
-    def get_default(self):
-        default = self.default
+    def get_default(self, empty):
+        if empty:
+            default = self.default_empty
+        else:
+            default = self.default
 
         if callable(default):
             default = default()
@@ -133,23 +135,19 @@ class Field(object):
 
     def validate_empty_values(self, data):
         if data is empty:
-            if self.required:
-                self.fail('required')
+            data = self.get_default(True)
+        elif data is None:
+            data = self.get_default(False)
 
-            return (True, self.get_default())
+        if data is None and self.required:
+            self.fail('required')
 
-        if data is None:
-            if not self.null:
-                self.fail('null')
-
-            return (True, None)
-
-        return (False, data)
+        return data
 
     def run_validation(self, data):
-        (is_empty, data) = self.validate_empty_values(data)
+        data = self.validate_empty_values(data)
 
-        if is_empty:
+        if data is None:
             return data
 
         value = self.to_internal_value(data)
@@ -350,7 +348,6 @@ class ListField(Field):
         assert self.child is not None
 
         kwargs.setdefault('default', list)
-        kwargs.setdefault('null', False)
 
         super(ListField, self).__init__(*args, **kwargs)
 
@@ -400,7 +397,6 @@ class CommaSeparatedField(Field):
         assert self.child is not None
 
         kwargs.setdefault('default', list)
-        kwargs.setdefault('null', False)
 
         super(CommaSeparatedField, self).__init__(**kwargs)
 

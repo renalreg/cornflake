@@ -44,9 +44,9 @@ def test_none():
     o = [date(2016, 1, 1), None, date(2016, 1, 2)]
 
     with pytest.raises(ValidationError):
-        ListField(child=DateField(null=False)).to_internal_value(i)
+        ListField(child=DateField(required=True)).to_internal_value(i)
 
-    assert ListField(child=DateField(null=True)).to_internal_value(i) == o
+    assert ListField(child=DateField(required=False)).to_internal_value(i) == o
 
 
 def test_string_field():
@@ -84,7 +84,4 @@ def test_default():
 
     # Default should be an empty list
     assert field.run_validation(empty) == []
-
-    # ListField doesn't allow None by default
-    with pytest.raises(ValidationError):
-        field.run_validation(None)
+    assert field.run_validation(None) == []
