@@ -417,39 +417,39 @@ class ListSerializer(BaseSerializer):
 
 class ProxySerializer(BaseSerializer):
     def get_partial(self):
-        serializer = self.get_external_serializer(self.initial_data)
+        serializer = self.get_deserializer(self.initial_data)
         serializer.bind(self)
         return serializer.get_partial()
 
-    def get_internal_serializer(self, data):
+    def get_serializer(self, data):
         raise NotImplementedError
 
-    def get_external_serializer(self, data):
+    def get_deserializer(self, data):
         raise NotImplementedError
 
     def run_validation(self, data):
-        serializer = self.get_external_serializer(data)
+        serializer = self.get_deserializer(data)
         serializer.bind(self)
         return serializer.run_validation(data)
 
     def to_internal_value(self, data):
-        serializer = self.get_external_serializer(data)
+        serializer = self.get_deserializer(data)
         serializer.bind(self)
         return serializer.to_internal_value(data)
 
     def to_representation(self, value):
-        serializer = self.get_internal_serializer(value)
+        serializer = self.get_serializer(value)
         serializer.bind(self)
         return serializer.to_representation(value)
 
     def create(self, validated_data):
-        serializer = self.get_internal_serializer(validated_data)
+        serializer = self.get_serializer(validated_data)
         serializer.bind(self)
         instance = serializer.create(validated_data)
         return instance
 
     def update(self, instance, validated_data):
-        serializer = self.get_internal_serializer(validated_data)
+        serializer = self.get_serializer(validated_data)
         serializer.bind(self)
         instance = serializer.update(instance, validated_data)
         return instance
