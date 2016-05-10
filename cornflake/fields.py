@@ -126,10 +126,10 @@ class Field(object):
         return initial
 
     def to_representation(self, value):
-        raise NotImplementedError
+        return value
 
     def to_internal_value(self, data):
-        raise NotImplementedError
+        return data
 
     def validate_empty_values(self, data):
         if data is empty:
