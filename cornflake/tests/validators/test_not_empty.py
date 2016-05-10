@@ -22,3 +22,8 @@ def test_empty_str():
 def test_empty_list():
     with pytest.raises(ValidationError):
         not_empty()([])
+
+
+def test_none():
+    with pytest.raises(ValidationError):
+        not_empty()(None)

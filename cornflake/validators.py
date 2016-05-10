@@ -52,7 +52,7 @@ def none_if_blank():
 
 def not_empty():
     def not_empty_f(value):
-        if len(value) == 0:
+        if value is None or len(value) == 0:
             raise ValidationError('This field is required.')
 
         return value
