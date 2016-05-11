@@ -17,7 +17,7 @@ class ModelSerializer(serializers.Serializer):
         sqltypes.Numeric: fields.FloatField,
         postgresql.INET: fields.StringField,
         postgresql.UUID: fields.UUIDField,
-        postgresql.JSONB: fields.JSONField
+        postgresql.JSONB: fields.Field
     }
 
     class Meta(object):

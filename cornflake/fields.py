@@ -563,11 +563,3 @@ class EnumLookupField(LookupField):
     def __init__(self, enum, items, **kwargs):
         key_field = EnumField(enum)
         super(EnumLookupField, self).__init__(key_field, items, **kwargs)
-
-
-class JSONField(Field):
-    def to_internal_value(self, data):
-        return data
-
-    def to_representation(self, value):
-        return value
