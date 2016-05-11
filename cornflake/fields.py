@@ -288,6 +288,12 @@ class DateField(Field):
         'datetime': 'Expected a date but got a datetime.',
     }
 
+    def parse(self, data):
+        return parse_datetime(data).date()
+
+    def format(self, value):
+        return value.isoformat()
+
     def to_internal_value(self, data):
         if isinstance(data, datetime):
             self.fail('datetime')
@@ -299,14 +305,14 @@ class DateField(Field):
             self.fail('invalid')
         else:
             try:
-                value = parse_datetime(data).date()
+                value = self.parse(data)
             except ValueError:
                 self.fail('invalid')
 
             return value
 
     def to_representation(self, value):
-        return value.isoformat()
+        return self.format(value)
 
 
 class DateTimeField(Field):
@@ -314,6 +320,12 @@ class DateTimeField(Field):
         'invalid': 'Invalid date format.',
         'date': 'Expected a datetime but got a date.',
     }
+
+    def parse(self, data):
+        return parse_datetime(data)
+
+    def format(self, value):
+        return value.isoformat()
 
     def to_internal_value(self, data):
         if isinstance(data, datetime):
@@ -326,14 +338,14 @@ class DateTimeField(Field):
             self.fail('invalid')
         else:
             try:
-                value = parse_datetime(data)
+                value = self.parse(data)
             except ValueError:
                 self.fail('invalid')
 
             return value
 
     def to_representation(self, value):
-        return value.isoformat()
+        return self.format(value)
 
 
 class ListField(Field):
