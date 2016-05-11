@@ -8,7 +8,7 @@ setup(
     long_description=cornflake.__doc__,
     author='Rupert Bedford',
     author_email='rupert.bedford@renalregistry.nhs.uk',
-    url='https://www.renalreg.org/',
+    url='https://github.com/renalreg/cornflake',
     packages=find_packages(),
     install_requires=[
         'bleach',
