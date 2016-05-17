@@ -1,11 +1,9 @@
 from setuptools import setup, find_packages
 
-import cornflake
-
 setup(
     name='cornflake',
-    version=cornflake.__version__,
-    long_description=cornflake.__doc__,
+    version='0.1.0',
+    description='A simple library for converting to and from Python objects',
     author='Rupert Bedford',
     author_email='rupert.bedford@renalregistry.nhs.uk',
     url='https://github.com/renalreg/cornflake',
