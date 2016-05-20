@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cornflake',
-    version='0.1.0',
+    version='0.2.0',
     description='A simple library for converting to and from Python objects',
     author='Rupert Bedford',
     author_email='rupert.bedford@renalregistry.nhs.uk',
