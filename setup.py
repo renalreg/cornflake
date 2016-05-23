@@ -1,8 +1,12 @@
+import re
 from setuptools import setup, find_packages
+
+with open('cornflake/__init__.py', 'r') as f:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
 setup(
     name='cornflake',
-    version='0.2.0',
+    version=version,
     description='A simple library for converting to and from Python objects',
     author='Rupert Bedford',
     author_email='rupert.bedford@renalregistry.nhs.uk',
