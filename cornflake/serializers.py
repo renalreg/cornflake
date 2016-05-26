@@ -275,7 +275,7 @@ class Serializer(BaseSerializer):
 
     def run_validators_on_serializer(self, data, validators):
         try:
-            for validator in self.validators:
+            for validator in validators:
                 if hasattr(validator, 'set_context'):
                     validator.set_context(self)
 
