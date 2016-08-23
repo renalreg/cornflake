@@ -506,8 +506,11 @@ class LookupField(Field):
         'invalid': 'Not a valid value.'
     }
 
-    def __init__(self, key_field, items, key_name='key', value_name='value', **kwargs):
+    def __init__(self, items, key_field=None, key_name='key', value_name='value', **kwargs):
         super(LookupField, self).__init__(**kwargs)
+
+        if key_field is None:
+            key_field = Field()
 
         self.key_field = key_field
         self.key_field.bind(self)
@@ -552,17 +555,17 @@ class LookupField(Field):
 
 class StringLookupField(LookupField):
     def __init__(self, items, **kwargs):
-        key_field = StringField()
-        super(StringLookupField, self).__init__(key_field, items, **kwargs)
+        kwargs['key_field'] = StringField()
+        super(StringLookupField, self).__init__(items, **kwargs)
 
 
 class IntegerLookupField(LookupField):
     def __init__(self, items, **kwargs):
-        key_field = IntegerField()
-        super(IntegerLookupField, self).__init__(key_field, items, **kwargs)
+        kwargs['key_field'] = IntegerField()
+        super(IntegerLookupField, self).__init__(items, **kwargs)
 
 
 class EnumLookupField(LookupField):
     def __init__(self, enum, items, **kwargs):
-        key_field = EnumField(enum)
-        super(EnumLookupField, self).__init__(key_field, items, **kwargs)
+        kwargs['key_field'] = EnumField(enum)
+        super(EnumLookupField, self).__init__(items, **kwargs)
