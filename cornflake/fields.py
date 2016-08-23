@@ -31,7 +31,7 @@ class Field(object):
 
     def __init__(
         self,
-        source=None,
+        source=None, field_name=None,
         read_only=False, write_only=False,
         required=None, default=None, default_empty=empty,
         validators=None, error_messages=None,
@@ -54,6 +54,7 @@ class Field(object):
         assert not (required and read_only)
 
         self.source = source
+        self.field_name = field_name
         self.required = required
         self.default = default
         self.default_empty = default_empty
@@ -78,8 +79,10 @@ class Field(object):
         self._context = {}
 
     def bind(self, parent, field_name=None):
-        self.field_name = field_name
         self.parent = parent
+
+        if self.field_name is None:
+            self.field_name = field_name
 
         if self.source is None:
             self.source = field_name
