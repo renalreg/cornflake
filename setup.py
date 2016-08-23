@@ -1,6 +1,7 @@
 import re
 from setuptools import setup, find_packages
 
+# https://github.com/kennethreitz/requests/blob/v2.11.1/setup.py#L50
 with open('cornflake/__init__.py', 'r') as f:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
