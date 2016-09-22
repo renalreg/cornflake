@@ -112,6 +112,6 @@ License
 
 Copyright (c) 2016 UK Renal Registry.
 
-Licensed under the `MIT <LICENSE.md>`_ license.
+Licensed under the `MIT <LICENSE.txt>`_ license.
 
 .. _`Django REST Framework`: http://www.django-rest-framework.org/
