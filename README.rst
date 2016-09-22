@@ -107,4 +107,11 @@ Run tests with the `tox` command:
     pip install tox
     tox
 
+License
+-------
+
+Copyright (c) 2016 UK Renal Registry.
+
+Licensed under the `MIT <LICENSE.md>`_ license.
+
 .. _`Django REST Framework`: http://www.django-rest-framework.org/
