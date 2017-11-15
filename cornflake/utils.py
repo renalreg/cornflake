@@ -1,4 +1,3 @@
-import sys
 import re
 from datetime import date, datetime
 
@@ -62,4 +61,4 @@ def parse_datetime(value):
     try:
         return iso8601.parse_date(value)
     except iso8601.ParseError:
-        raise ValueError('Invalid date'), None, sys.exc_info()[2]
+        raise ValueError('Invalid date')

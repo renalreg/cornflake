@@ -13,7 +13,12 @@ class _empty(object):
     def __nonzero__(self):
         return False
 
+
 empty = _empty()
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 class Field(object):
@@ -30,12 +35,12 @@ class Field(object):
         return instance
 
     def __init__(
-        self,
-        source=None, field_name=None,
-        read_only=False, write_only=False,
-        required=None, default=None, default_empty=empty,
-        validators=None, error_messages=None,
-        initial=None
+            self,
+            source=None, field_name=None,
+            read_only=False, write_only=False,
+            required=None, default=None, default_empty=empty,
+            validators=None, error_messages=None,
+            initial=None
     ):
         # Keep track of field declaration order
         self._creation_counter = Field._creation_counter
@@ -199,7 +204,7 @@ class StringField(Field):
         super(StringField, self).__init__(**kwargs)
 
     def to_internal_value(self, data):
-        if isinstance(data, dict) or isinstance(data, list) or isinstance(data, bool):
+        if isinstance(data, (dict, list, bool)):
             self.fail('invalid')
 
         value = six.text_type(data)

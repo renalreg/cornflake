@@ -196,7 +196,8 @@ class ReferenceField(fields.Field):
             self.serializer.bind(self, field_name)
 
     def get_instance(self, id):
-        instance = self.model_class.query.filter(getattr(self.model_class, self.model_id) == id).first()
+        attribute = getattr(self.model_class, self.model_id)
+        instance = self.model_class.query.filter(attribute == id).first()
 
         if instance is None:
             self.fail('not_found')

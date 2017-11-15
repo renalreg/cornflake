@@ -12,7 +12,7 @@ class ValidationError(Exception):
             new_errors = OrderedDict()
 
             for k, v in errors.items():
-                if isinstance(v, dict) or isinstance(v, list):
+                if isinstance(v, (dict, list)):
                     v = ValidationError.normalise(v)
                 else:
                     v = [v]
@@ -22,7 +22,7 @@ class ValidationError(Exception):
             new_errors = []
 
             for x in errors:
-                if isinstance(x, dict) or isinstance(x, list):
+                if isinstance(x, (dict, list)):
                     x = ValidationError.normalise(x)
 
                 new_errors.append(x)
