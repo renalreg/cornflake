@@ -10,11 +10,14 @@ from cornflake.exceptions import ValidationError, SkipField
 
 
 class _empty(object):
-    def __nonzero__(self):
+    def __bool__(self):
         return False
+
+    __nonzero__ = __bool__
 
 
 empty = _empty()
+
 try:
     basestring
 except NameError:

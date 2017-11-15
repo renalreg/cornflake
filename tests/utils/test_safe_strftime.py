@@ -109,7 +109,7 @@ def test_invalid_directive():
     with pytest.raises(ValueError) as e:
         safe_strftime(datetime(1234, 1, 2, 3, 4, 5, tzinfo=pytz.utc), '%e')
 
-    assert e.value.message == 'Invalid format string'
+    assert e.value.args[0] == 'Invalid format string'
 
 
 def test_blank():

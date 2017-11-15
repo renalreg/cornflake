@@ -61,7 +61,7 @@ def test_fields():
 
     serializer_fields = serializer.fields
 
-    assert serializer_fields.keys() == [x[0] for x in expected]
+    assert list(serializer_fields.keys()) == [x[0] for x in expected]
     assert [(x.field_name, x.tag) for x in serializer_fields.values()] == expected
 
 
@@ -261,7 +261,7 @@ def test_data():
         foo = fields.DateField()
 
     data = {'foo': '2001-02-03'}
-    instance = {'foo': date(2001, 02, 03)}
+    instance = {'foo': date(2001, 2, 3)}
 
     serializer = FooSerializer(instance)
     assert serializer.data == data
