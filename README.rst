@@ -110,7 +110,7 @@ Run tests with the `tox` command:
 License
 -------
 
-Copyright (c) 2016 UK Renal Registry.
+Copyright (c) 2017 UK Renal Registry.
 
 Licensed under the `MIT <LICENSE.txt>`_ license.
 
