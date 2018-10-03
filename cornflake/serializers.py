@@ -199,9 +199,9 @@ class Serializer(BaseSerializer):
 
     def get_partial(self):
         return dict(
-            self.get_initial().items() +
-            self.data.items() +
-            self.initial_data.items()
+            list(self.get_initial().items()) +
+            list(self.data.items()) +
+            list(self.initial_data.items())
         )
 
     def get_fields(self):
