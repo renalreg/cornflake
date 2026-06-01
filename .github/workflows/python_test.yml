@@ -1,0 +1,43 @@
+# 📘 Full documentation:
+# https://github.com/renalreg/.github/blob/main/README.md#python-test-workflow
+
+
+name: Python Test
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    name: Python Test workflow
+    if: ${{ !startsWith(github.head_ref, 'release-please--') }}
+    uses: renalreg/.github/.github/workflows/python_test.yml@main
+    secrets: inherit
+    with:
+      python_versions: '["3.9", "3.10", "3.11"]'
+    #   # Description: Python versions to test against
+    #   # Default: lowest supported Python version
+    #
+    #   os: '["ubuntu-latest", "windows-latest"]'
+    #   # Description: Operating systems to run tests on
+    #   # Default: ["ubuntu-latest"]
+    #
+      package_manager_command: "pip install uv"
+    #   # Description: Command to install an additional package manager
+    #   # Default: ""
+    #
+      install_command: "uv sync"
+    #   # Description: Command used to install dependencies
+    #   # Default: "pip install -r requirements.txt"
+    #
+      test_command: "uv run tox"
+    #   # Description: Command used to execute the test suite
+    #   # Default: "pytest"
+    #
+      org_deps: false
+    #   # Description: Boolean, is private repo access required by dependencies
+    #   # Default: false
