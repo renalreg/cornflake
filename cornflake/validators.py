@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, date
+
 try:
     from urlparse import urlparse
 except ImportError:
@@ -11,22 +12,24 @@ import pytz
 from cornflake.fields import ValidationError, SkipField
 from cornflake.utils import is_date, date_to_datetime, safe_strftime
 
-HUMAN_DATE_FORMAT = '%d/%m/%Y'
+HUMAN_DATE_FORMAT = "%d/%m/%Y"
 
-EMAIL_REGEX = re.compile(r'^\S+@[^\.@\s][^@]*\.[^\.@\s]+$')
-EMAIL_NAME_REGEX = re.compile(r'^.* <\S+@[^\.@\s][^@]*\.[^\.@\s]+>$')
+EMAIL_REGEX = re.compile(r"^\S+@[^\.@\s][^@]*\.[^\.@\s]+$")
+EMAIL_NAME_REGEX = re.compile(r"^.* <\S+@[^\.@\s][^@]*\.[^\.@\s]+>$")
 
-POSTCODE_BFPO_REGEX = re.compile('^BFPO[ ]?\\d{1,4}$')
-POSTCODE_REGEX = re.compile('^(GIR[ ]?0AA|((AB|AL|B|BA|BB|BD|BH|BL|BN|BR|BS|BT|BX|CA|CB|CF|CH|CM|CO|CR|CT|CV|CW|DA|DD|DE|DG|DH|DL|DN|DT|DY|E|EC|EH|EN|EX|FK|FY|G|GL|GY|GU|HA|HD|HG|HP|HR|HS|HU|HX|IG|IM|IP|IV|JE|KA|KT|KW|KY|L|LA|LD|LE|LL|LN|LS|LU|M|ME|MK|ML|N|NE|NG|NN|NP|NR|NW|OL|OX|PA|PE|PH|PL|PO|PR|RG|RH|RM|S|SA|SE|SG|SK|SL|SM|SN|SO|SP|SR|SS|ST|SW|SY|TA|TD|TF|TN|TQ|TR|TS|TW|UB|W|WA|WC|WD|WF|WN|WR|WS|WV|YO|ZE)(\\d[\\dA-Z]?[ ]?\\d[ABD-HJLN-UW-Z]{2}))|BFPO[ ]?\\d{1,4})$')  # noqa
+POSTCODE_BFPO_REGEX = re.compile("^BFPO[ ]?\\d{1,4}$")
+POSTCODE_REGEX = re.compile(
+    "^(GIR[ ]?0AA|((AB|AL|B|BA|BB|BD|BH|BL|BN|BR|BS|BT|BX|CA|CB|CF|CH|CM|CO|CR|CT|CV|CW|DA|DD|DE|DG|DH|DL|DN|DT|DY|E|EC|EH|EN|EX|FK|FY|G|GL|GY|GU|HA|HD|HG|HP|HR|HS|HU|HX|IG|IM|IP|IV|JE|KA|KT|KW|KY|L|LA|LD|LE|LL|LN|LS|LU|M|ME|MK|ML|N|NE|NG|NN|NP|NR|NW|OL|OX|PA|PE|PH|PL|PO|PR|RG|RH|RM|S|SA|SE|SG|SK|SL|SM|SN|SO|SP|SR|SS|ST|SW|SY|TA|TD|TF|TN|TQ|TR|TS|TW|UB|W|WA|WC|WD|WF|WN|WR|WS|WV|YO|ZE)(\\d[\\dA-Z]?[ ]?\\d[ABD-HJLN-UW-Z]{2}))|BFPO[ ]?\\d{1,4})$"
+)  # noqa
 
-TAB_TO_SPACE_REGEX = re.compile('\t')
-NORMALISE_WHITESPACE_REGEX = re.compile(r'\s{2,}')
+TAB_TO_SPACE_REGEX = re.compile("\t")
+NORMALISE_WHITESPACE_REGEX = re.compile(r"\s{2,}")
 
 
 def required():
     def required_f(value):
         if value is None:
-            raise ValidationError('This field is required.')
+            raise ValidationError("This field is required.")
 
         return value
 
@@ -56,7 +59,7 @@ def none_if_blank():
 def not_empty():
     def not_empty_f(value):
         if value is None or len(value) == 0:
-            raise ValidationError('This field is required.')
+            raise ValidationError("This field is required.")
 
         return value
 
@@ -65,9 +68,9 @@ def not_empty():
 
 def min_(min_value, units=None):
     if units is None:
-        message = 'Must be greater than or equal to %s.'
+        message = "Must be greater than or equal to %s."
     else:
-        message = 'Must be greater than or equal to %%s %s.' % units
+        message = "Must be greater than or equal to %%s %s." % units
 
     def min_f(value):
         if value < min_value:
@@ -80,9 +83,9 @@ def min_(min_value, units=None):
 
 def max_(max_value, units=None):
     if units is None:
-        message = 'Must be less than or equal to %s.'
+        message = "Must be less than or equal to %s."
     else:
-        message = 'Must be less than or equal to %%s %s.' % units
+        message = "Must be less than or equal to %%s %s." % units
 
     def max_f(value):
         if value > max_value:
@@ -109,7 +112,7 @@ def range_(min_value=None, max_value=None, units=None):
 def in_(values):
     def in_f(value):
         if value not in values:
-            raise ValidationError('Not a valid value.')
+            raise ValidationError("Not a valid value.")
 
         return value
 
@@ -142,7 +145,9 @@ def after(min_dt, dt_format=HUMAN_DATE_FORMAT):
             value_dt = value
 
         if value_dt < min_dt:
-            raise ValidationError('Value is before %s.' % safe_strftime(min_dt, dt_format))
+            raise ValidationError(
+                "Value is before %s." % safe_strftime(min_dt, dt_format)
+            )
 
         return value
 
@@ -160,7 +165,9 @@ def before(max_dt, dt_format=HUMAN_DATE_FORMAT):
             value_dt = value
 
         if value_dt > max_dt:
-            raise ValidationError('Value is after %s.' % safe_strftime(max_dt, dt_format))
+            raise ValidationError(
+                "Value is after %s." % safe_strftime(max_dt, dt_format)
+            )
 
         return value
 
@@ -170,7 +177,9 @@ def before(max_dt, dt_format=HUMAN_DATE_FORMAT):
 def max_length(max_value):
     def max_length_f(value):
         if len(value) > max_value:
-            raise ValidationError('Value is too long (max length is %d characters).' % max_value)
+            raise ValidationError(
+                "Value is too long (max length is %d characters)." % max_value
+            )
 
         return value
 
@@ -180,7 +189,9 @@ def max_length(max_value):
 def min_length(min_value):
     def min_length_f(value):
         if len(value) < min_value:
-            raise ValidationError('Value is too short (min length is %d characters).' % min_value)
+            raise ValidationError(
+                "Value is too short (min length is %d characters)." % min_value
+            )
 
         return value
 
@@ -191,8 +202,10 @@ def email_address(name=False):
     def email_address_f(value):
         value = value.lower()
 
-        if not EMAIL_REGEX.match(value) and (not name or not EMAIL_NAME_REGEX.match(value)):
-            raise ValidationError('Not a valid email address.')
+        if not EMAIL_REGEX.match(value) and (
+            not name or not EMAIL_NAME_REGEX.match(value)
+        ):
+            raise ValidationError("Not a valid email address.")
 
         return value
 
@@ -202,15 +215,15 @@ def email_address(name=False):
 def postcode():
     def postcode_f(value):
         value = value.upper()
-        value = re.sub('[^A-Z0-9]', '', value)
+        value = re.sub("[^A-Z0-9]", "", value)
 
         if not POSTCODE_REGEX.match(value):
-            raise ValidationError('Not a valid postcode.')
+            raise ValidationError("Not a valid postcode.")
 
         if POSTCODE_BFPO_REGEX.match(value):
-            value = value[:-4] + ' ' + value[-4:]
+            value = value[:-4] + " " + value[-4:]
         else:
-            value = value[:-3] + ' ' + value[-3:]
+            value = value[:-3] + " " + value[-3:]
 
         return value
 
@@ -220,10 +233,10 @@ def postcode():
 def normalise_whitespace():
     def normalise_whitespace_f(value):
         # Tabs to spaces
-        value = TAB_TO_SPACE_REGEX.sub(' ', value)
+        value = TAB_TO_SPACE_REGEX.sub(" ", value)
 
         # Multiple spaces
-        value = NORMALISE_WHITESPACE_REGEX.sub(' ', value)
+        value = NORMALISE_WHITESPACE_REGEX.sub(" ", value)
 
         return value
 
@@ -251,10 +264,10 @@ def url():
         result = urlparse(value)
 
         if not result.scheme:
-            raise ValidationError('No scheme.')
+            raise ValidationError("No scheme.")
 
         if not result.netloc:
-            raise ValidationError('No network location.')
+            raise ValidationError("No network location.")
 
         return value
 
@@ -265,10 +278,8 @@ def sanitize_html():
     def sanitize_html_f(value):
         value = bleach.clean(
             value,
-            tags=['a', 'b', 'br', 'em', 'i', 'li', 'ol', 'p', 'strong', 'ul', 'div'],
-            attributes={
-                'a': ['href', 'target']
-            }
+            tags=["a", "b", "br", "em", "i", "li", "ol", "p", "strong", "ul", "div"],
+            attributes={"a": ["href", "target"]},
         )
 
         return value

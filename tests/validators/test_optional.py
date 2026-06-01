@@ -5,8 +5,8 @@ from cornflake.validators import optional
 
 
 def test_str():
-    value = optional()('hello')
-    assert value == 'hello'
+    value = optional()("hello")
+    assert value == "hello"
 
 
 def test_none():
@@ -15,5 +15,5 @@ def test_none():
 
 
 def test_empty():
-    value = optional()('')
-    assert value == ''
+    value = optional()("")
+    assert value == ""

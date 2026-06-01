@@ -5,8 +5,8 @@ from cornflake.validators import required
 
 
 def test_str():
-    value = required()('hello')
-    assert value == 'hello'
+    value = required()("hello")
+    assert value == "hello"
 
 
 def test_int():
@@ -15,8 +15,8 @@ def test_int():
 
 
 def test_empty():
-    value = required()('')
-    assert value == ''
+    value = required()("")
+    assert value == ""
 
 
 def test_none():

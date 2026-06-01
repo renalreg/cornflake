@@ -29,70 +29,70 @@ def test_root():
 def test_error_messages():
     class Foo(Field):
         error_messages = {
-            'a': 'b',
-            'c': 'd',
+            "a": "b",
+            "c": "d",
         }
 
     field = Foo()
-    assert field.error_messages['a'] == 'b'
+    assert field.error_messages["a"] == "b"
 
-    field = Foo(error_messages={'a': 'e'})
-    assert field.error_messages['a'] == 'e'
-    assert field.error_messages['c'] == 'd'
+    field = Foo(error_messages={"a": "e"})
+    assert field.error_messages["a"] == "e"
+    assert field.error_messages["c"] == "d"
 
 
 def test_source():
     class o:
-        a = 'b'
-        c = 'd'
+        a = "b"
+        c = "d"
 
     d = {
-        'a': 'b',
-        'c': 'd',
+        "a": "b",
+        "c": "d",
     }
 
     field = Field()
-    field.bind(None, 'a')
-    assert field.get_attribute(o) == 'b'
-    assert field.get_attribute(d) == 'b'
-    assert field.get_value(d) == 'b'
+    field.bind(None, "a")
+    assert field.get_attribute(o) == "b"
+    assert field.get_attribute(d) == "b"
+    assert field.get_value(d) == "b"
 
-    field = Field(source='c')
-    field.bind(None, 'a')
-    assert field.get_attribute(o) == 'd'
-    assert field.get_attribute(d) == 'd'
-    assert field.get_value(d) == 'b'
+    field = Field(source="c")
+    field.bind(None, "a")
+    assert field.get_attribute(o) == "d"
+    assert field.get_attribute(d) == "d"
+    assert field.get_value(d) == "b"
 
 
 def test_deepcopy():
-    field = Field(source='foo')
-    field.foo = 'bar'
+    field = Field(source="foo")
+    field.foo = "bar"
     field = copy.deepcopy(field)
-    assert field.source == 'foo'
-    assert not hasattr(field, 'foo')
+    assert field.source == "foo"
+    assert not hasattr(field, "foo")
 
 
 def test_get_value():
     field = Field()
-    field.bind(None, 'a')
-    assert field.get_value({'a': 'b'}) == 'b'
+    field.bind(None, "a")
+    assert field.get_value({"a": "b"}) == "b"
     assert field.get_value({}) is empty
 
 
 def test_get_attribute():
     class o:
-        a = 'b'
+        a = "b"
 
-    d = {'a': 'b'}
-
-    field = Field()
-    field.bind(None, 'a')
-
-    assert field.get_attribute(o) == 'b'
-    assert field.get_attribute(d) == 'b'
+    d = {"a": "b"}
 
     field = Field()
-    field.bind(None, 'b')
+    field.bind(None, "a")
+
+    assert field.get_attribute(o) == "b"
+    assert field.get_attribute(d) == "b"
+
+    field = Field()
+    field.bind(None, "b")
 
     field.required = True
 
@@ -112,10 +112,10 @@ def test_get_attribute():
 
 
 def test_default():
-    field = Field(default='foo')
-    assert field.run_validation('bar') == 'bar'
-    assert field.run_validation(None) == 'foo'
-    assert field.run_validation(empty) == 'foo'
+    field = Field(default="foo")
+    assert field.run_validation("bar") == "bar"
+    assert field.run_validation(None) == "foo"
+    assert field.run_validation(empty) == "foo"
 
 
 def test_default_callable():
@@ -127,7 +127,7 @@ def test_default_callable():
 
     field = Field(default=f)
 
-    assert field.run_validation('bar') == 'bar'
+    assert field.run_validation("bar") == "bar"
     assert field.run_validation(None) == 1
     assert field.run_validation(empty) == 2
     assert field.run_validation(empty) == 3
@@ -176,7 +176,7 @@ def test_validators():
 
 def test_validators_error():
     def error(value):
-        raise ValidationError('Uh oh!')
+        raise ValidationError("Uh oh!")
 
     field = Field(validators=[error])
 
@@ -194,7 +194,7 @@ def test_validators_skip():
 
 
 def test_set_context():
-    class f():
+    class f:
         def __init__(self):
             self.parent = None
 
@@ -205,6 +205,6 @@ def test_set_context():
             self.parent = parent
 
     field = Field(validators=[f()])
-    field.foo = 'bar'
+    field.foo = "bar"
 
-    assert field.run_validation(123) == 'bar'
+    assert field.run_validation(123) == "bar"

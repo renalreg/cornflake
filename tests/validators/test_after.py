@@ -19,19 +19,27 @@ def test_datetime_date():
 
 def test_less_than():
     with pytest.raises(ValidationError):
-        after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))(datetime(2014, 12, 31, 23, 59, 59, tzinfo=pytz.utc))
+        after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))(
+            datetime(2014, 12, 31, 23, 59, 59, tzinfo=pytz.utc)
+        )
 
 
 def test_equal():
-    after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))
+    after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))(
+        datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc)
+    )
 
 
 def test_greater_than():
-    after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))(datetime(2015, 1, 1, 0, 0, 1, tzinfo=pytz.utc))
+    after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc))(
+        datetime(2015, 1, 1, 0, 0, 1, tzinfo=pytz.utc)
+    )
 
 
 def test_dt_format():
     with pytest.raises(ValidationError) as e:
-        after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc), dt_format='%Y-%m-%d')(datetime(2014, 12, 31, 0, 0, 0, tzinfo=pytz.utc))
+        after(datetime(2015, 1, 1, 0, 0, 0, tzinfo=pytz.utc), dt_format="%Y-%m-%d")(
+            datetime(2014, 12, 31, 0, 0, 0, tzinfo=pytz.utc)
+        )
 
-    assert e.value.errors[0] == 'Value is before 2015-01-01.'
+    assert e.value.errors[0] == "Value is before 2015-01-01."

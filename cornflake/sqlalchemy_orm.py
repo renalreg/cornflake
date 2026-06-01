@@ -17,7 +17,7 @@ class ModelSerializer(serializers.Serializer):
         sqltypes.Numeric: fields.FloatField,
         postgresql.INET: fields.StringField,
         postgresql.UUID: fields.UUIDField,
-        postgresql.JSONB: fields.Field
+        postgresql.JSONB: fields.Field,
     }
 
     class Meta(object):
@@ -29,9 +29,9 @@ class ModelSerializer(serializers.Serializer):
         return model_class
 
     def get_model_fields(self):
-        """ List of model fields to include (defaults to all) """
+        """List of model fields to include (defaults to all)"""
 
-        model_fields = getattr(self.Meta, 'fields', None)
+        model_fields = getattr(self.Meta, "fields", None)
 
         if model_fields is not None:
             model_fields = set(model_fields)
@@ -39,19 +39,19 @@ class ModelSerializer(serializers.Serializer):
         return model_fields
 
     def get_model_exclude(self):
-        """ List of fields to exclude """
+        """List of fields to exclude"""
 
-        return set(getattr(self.Meta, 'exclude', []))
+        return set(getattr(self.Meta, "exclude", []))
 
     def get_model_read_only(self):
-        """ Fields that should be read only (serialized but not deserialized) """
+        """Fields that should be read only (serialized but not deserialized)"""
 
-        return set(getattr(self.Meta, 'read_only', []))
+        return set(getattr(self.Meta, "read_only", []))
 
     def get_model_write_only(self):
-        """ Fields that should be write only (deserialized but not serialized) """
+        """Fields that should be write only (deserialized but not serialized)"""
 
-        return set(getattr(self.Meta, 'write_only', []))
+        return set(getattr(self.Meta, "write_only", []))
 
     def get_field_class(self, col_type):
         for sql_type, field_type in self.type_map.items():
@@ -96,12 +96,12 @@ class ModelSerializer(serializers.Serializer):
             # Read only field
             # Don't allow id column to be updated
             # TODO(rupert) default to read only if primary key (remove 'id' check)
-            if key in model_read_only or key == 'id':
-                field_kwargs['read_only'] = True
+            if key in model_read_only or key == "id":
+                field_kwargs["read_only"] = True
 
             # Write only field
             if key in model_write_only:
-                field_kwargs['write_only'] = True
+                field_kwargs["write_only"] = True
 
             # Get the field class for this column type
             field_class = self.get_field_class(col_type)
@@ -139,22 +139,19 @@ class ReferenceField(fields.Field):
         postgresql.UUID: fields.UUIDField,
     }
 
-    error_messages = {
-        'not_found': 'Object not found.',
-        'no_id': 'No ID supplied.'
-    }
+    error_messages = {"not_found": "Object not found.", "no_id": "No ID supplied."}
 
     model_class = None
 
     # TODO(rupert) use Model.id instead, default to getattr(model_class, 'id')
-    model_id = 'id'
+    model_id = "id"
 
     serializer_class = None
 
     def __init__(self, **kwargs):
-        self.model_class = kwargs.pop('model_class', self.model_class)
-        self.model_id = kwargs.pop('model_id', self.model_id)
-        self.serializer_class = kwargs.pop('serializer_class', self.serializer_class)
+        self.model_class = kwargs.pop("model_class", self.model_class)
+        self.model_id = kwargs.pop("model_id", self.model_id)
+        self.serializer_class = kwargs.pop("serializer_class", self.serializer_class)
 
         assert self.model_class is not None
         assert self.model_id is not None
@@ -200,7 +197,7 @@ class ReferenceField(fields.Field):
         instance = self.model_class.query.filter(attribute == id).first()
 
         if instance is None:
-            self.fail('not_found')
+            self.fail("not_found")
 
         return instance
 
@@ -212,7 +209,7 @@ class ReferenceField(fields.Field):
             value = data.get(self.model_id)
 
             if value is None:
-                self.fail('no_id')
+                self.fail("no_id")
 
             instance_id = self.field.to_internal_value(value)
         else:

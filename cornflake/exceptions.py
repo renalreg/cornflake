@@ -72,7 +72,9 @@ class ValidationError(Exception):
             field_path = path + (field_name,)
 
             if isinstance(field_errors, collections.Mapping):
-                flattened_field_errors = ValidationError._flatten(field_errors, path=field_path)
+                flattened_field_errors = ValidationError._flatten(
+                    field_errors, path=field_path
+                )
                 flattened_errors.extend(flattened_field_errors)
             else:
                 for field_error in field_errors:

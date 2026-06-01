@@ -19,13 +19,11 @@ class _empty(object):
 empty = _empty()
 
 
-
-
 class Field(object):
     _creation_counter = 0
 
     error_messages = {
-        'required': 'This field is required.',
+        "required": "This field is required.",
     }
 
     def __new__(cls, *args, **kwargs):
@@ -35,12 +33,17 @@ class Field(object):
         return instance
 
     def __init__(
-            self,
-            source=None, field_name=None,
-            read_only=False, write_only=False,
-            required=None, default=None, default_empty=empty,
-            validators=None, error_messages=None,
-            initial=None
+        self,
+        source=None,
+        field_name=None,
+        read_only=False,
+        write_only=False,
+        required=None,
+        default=None,
+        default_empty=empty,
+        validators=None,
+        error_messages=None,
+        initial=None,
     ):
         # Keep track of field declaration order
         self._creation_counter = Field._creation_counter
@@ -71,7 +74,7 @@ class Field(object):
         messages = dict()
 
         for cls in reversed(self.__class__.__mro__):
-            messages.update(getattr(cls, 'error_messages', dict()))
+            messages.update(getattr(cls, "error_messages", dict()))
 
         if error_messages is not None:
             messages.update(error_messages)
@@ -148,7 +151,7 @@ class Field(object):
             data = self.get_default(False)
 
         if data is None and self.required:
-            self.fail('required')
+            self.fail("required")
 
         return data
 
@@ -166,7 +169,7 @@ class Field(object):
 
     def run_validators(self, value):
         for validator in self.validators:
-            if hasattr(validator, 'set_context'):
+            if hasattr(validator, "set_context"):
                 validator.set_context(self)
 
             try:
@@ -195,17 +198,15 @@ class Field(object):
 
 
 class StringField(Field):
-    error_messages = {
-        'invalid': 'A valid string is required.'
-    }
+    error_messages = {"invalid": "A valid string is required."}
 
     def __init__(self, **kwargs):
-        self.trim_whitespace = kwargs.pop('trim_whitespace', True)
+        self.trim_whitespace = kwargs.pop("trim_whitespace", True)
         super(StringField, self).__init__(**kwargs)
 
     def to_internal_value(self, data):
         if isinstance(data, (dict, list, bool)):
-            self.fail('invalid')
+            self.fail("invalid")
 
         value = six.text_type(data)
 
@@ -219,15 +220,13 @@ class StringField(Field):
 
 
 class BooleanField(Field):
-    error_messages = {
-        'invalid': 'A valid boolean is required.'
-    }
+    error_messages = {"invalid": "A valid boolean is required."}
 
-    TRUE_VALUES = {'t', 'true', 'y', 'yes', '1', 1, True}
-    FALSE_VALUES = {'f', 'false', 'n', 'no', '0', 0, False}
+    TRUE_VALUES = {"t", "true", "y", "yes", "1", 1, True}
+    FALSE_VALUES = {"f", "false", "n", "no", "0", 0, False}
 
     def to_internal_value(self, data):
-        if hasattr(data, 'lower'):
+        if hasattr(data, "lower"):
             data = data.lower()
 
         # Check for TypeError as list and dict aren't hashable
@@ -237,18 +236,16 @@ class BooleanField(Field):
             elif data in self.FALSE_VALUES:
                 return False
             else:
-                self.fail('invalid')
+                self.fail("invalid")
         except TypeError:
-            self.fail('invalid')
+            self.fail("invalid")
 
     def to_representation(self, value):
         return bool(value)
 
 
 class IntegerField(Field):
-    error_messages = {
-        'invalid': 'A valid integer is required.'
-    }
+    error_messages = {"invalid": "A valid integer is required."}
 
     def to_internal_value(self, data):
         if isinstance(data, str):
@@ -260,9 +257,9 @@ class IntegerField(Field):
 
             # No floats
             if value != value_f:
-                self.fail('invalid')
+                self.fail("invalid")
         except (ValueError, TypeError):
-            self.fail('invalid')
+            self.fail("invalid")
 
         return value
 
@@ -271,9 +268,7 @@ class IntegerField(Field):
 
 
 class FloatField(Field):
-    error_messages = {
-        'invalid': 'A valid number is required.'
-    }
+    error_messages = {"invalid": "A valid number is required."}
 
     def to_internal_value(self, data):
         if isinstance(data, str):
@@ -282,7 +277,7 @@ class FloatField(Field):
         try:
             value = float(data)
         except (ValueError, TypeError):
-            self.fail('invalid')
+            self.fail("invalid")
 
         return value
 
@@ -292,8 +287,8 @@ class FloatField(Field):
 
 class DateField(Field):
     error_messages = {
-        'invalid': 'Invalid date format.',
-        'datetime': 'Expected a date but got a datetime.',
+        "invalid": "Invalid date format.",
+        "datetime": "Expected a date but got a datetime.",
     }
 
     def parse(self, data):
@@ -304,18 +299,18 @@ class DateField(Field):
 
     def to_internal_value(self, data):
         if isinstance(data, datetime):
-            self.fail('datetime')
+            self.fail("datetime")
         elif isinstance(data, date):
             # Already a date
             return data
         elif not isinstance(data, six.string_types):
             # Not a string
-            self.fail('invalid')
+            self.fail("invalid")
         else:
             try:
                 value = self.parse(data)
             except ValueError:
-                self.fail('invalid')
+                self.fail("invalid")
 
             return value
 
@@ -325,8 +320,8 @@ class DateField(Field):
 
 class DateTimeField(Field):
     error_messages = {
-        'invalid': 'Invalid date format.',
-        'date': 'Expected a datetime but got a date.',
+        "invalid": "Invalid date format.",
+        "date": "Expected a datetime but got a date.",
     }
 
     def parse(self, data):
@@ -340,15 +335,15 @@ class DateTimeField(Field):
             # Already a datetime
             return data
         elif isinstance(data, date):
-            self.fail('date')
+            self.fail("date")
         elif not isinstance(data, six.string_types):
             # Not a string
-            self.fail('invalid')
+            self.fail("invalid")
         else:
             try:
                 value = self.parse(data)
             except ValueError:
-                self.fail('invalid')
+                self.fail("invalid")
 
             return value
 
@@ -359,15 +354,13 @@ class DateTimeField(Field):
 class ListField(Field):
     child = None
 
-    error_messages = {
-        'not_a_list': 'Expected a list.'
-    }
+    error_messages = {"not_a_list": "Expected a list."}
 
     def __init__(self, *args, **kwargs):
-        self.child = kwargs.pop('child', copy.deepcopy(self.child))
+        self.child = kwargs.pop("child", copy.deepcopy(self.child))
         assert self.child is not None
 
-        kwargs.setdefault('default', list)
+        kwargs.setdefault("default", list)
 
         super(ListField, self).__init__(*args, **kwargs)
 
@@ -375,7 +368,7 @@ class ListField(Field):
 
     def to_internal_value(self, data):
         if not isinstance(data, list):
-            self.fail('not_a_list')
+            self.fail("not_a_list")
 
         values = []
         errors = {}
@@ -408,15 +401,13 @@ class ListField(Field):
 class CommaSeparatedField(Field):
     child = None
 
-    error_messages = {
-        'invalid': 'A valid string is required.'
-    }
+    error_messages = {"invalid": "A valid string is required."}
 
     def __init__(self, **kwargs):
-        self.child = kwargs.pop('child', copy.deepcopy(self.child))
+        self.child = kwargs.pop("child", copy.deepcopy(self.child))
         assert self.child is not None
 
-        kwargs.setdefault('default', list)
+        kwargs.setdefault("default", list)
 
         super(CommaSeparatedField, self).__init__(**kwargs)
 
@@ -424,7 +415,7 @@ class CommaSeparatedField(Field):
 
     def to_internal_value(self, data):
         if isinstance(data, dict) or isinstance(data, bool):
-            self.fail('invalid')
+            self.fail("invalid")
 
         if isinstance(data, list):
             parts = data
@@ -434,7 +425,7 @@ class CommaSeparatedField(Field):
             if len(data) == 0:
                 parts = []
             else:
-                parts = data.split(',')
+                parts = data.split(",")
 
         values = []
 
@@ -453,26 +444,24 @@ class CommaSeparatedField(Field):
             else:
                 data.append(six.text_type(self.child.to_representation(value)))
 
-        data = ','.join(data)
+        data = ",".join(data)
 
         return data
 
 
 class UUIDField(Field):
-    error_messages = {
-        'invalid': 'A valid UUID is required.'
-    }
+    error_messages = {"invalid": "A valid UUID is required."}
 
     def to_internal_value(self, data):
         if isinstance(data, dict) or isinstance(data, list) or isinstance(data, bool):
-            self.fail('invalid')
+            self.fail("invalid")
 
         value = six.text_type(data)
 
         try:
             value = six.text_type(uuid.UUID(value))
         except ValueError:
-            self.fail('invalid')
+            self.fail("invalid")
 
         return value
 
@@ -481,9 +470,7 @@ class UUIDField(Field):
 
 
 class EnumField(Field):
-    error_messages = {
-        'invalid': 'Not a valid value.'
-    }
+    error_messages = {"invalid": "Not a valid value."}
 
     def __init__(self, enum, **kwargs):
         super(EnumField, self).__init__(**kwargs)
@@ -493,7 +480,7 @@ class EnumField(Field):
         try:
             value = self.enum(data)
         except ValueError:
-            self.fail('invalid')
+            self.fail("invalid")
 
         return value
 
@@ -507,11 +494,11 @@ class EnumField(Field):
 
 
 class LookupField(Field):
-    error_messages = {
-        'invalid': 'Not a valid value.'
-    }
+    error_messages = {"invalid": "Not a valid value."}
 
-    def __init__(self, items, key_field=None, key_name='key', value_name='value', **kwargs):
+    def __init__(
+        self, items, key_field=None, key_name="key", value_name="value", **kwargs
+    ):
         super(LookupField, self).__init__(**kwargs)
 
         if key_field is None:
@@ -533,19 +520,19 @@ class LookupField(Field):
             data = data.get(self.key_name, empty)
 
             if data is empty:
-                self.fail('required')
+                self.fail("required")
             elif data is None:
                 if None in self.items:
                     value = data
                 else:
-                    self.fail('required')
+                    self.fail("required")
             else:
                 value = self.key_field.to_internal_value(data)
         else:
             value = self.key_field.to_internal_value(data)
 
         if value not in self.items.keys():
-            self.fail('invalid')
+            self.fail("invalid")
 
         return value
 
@@ -554,23 +541,23 @@ class LookupField(Field):
 
         return {
             self.key_name: self.key_field.to_representation(key),
-            self.value_name: self.value_field.to_representation(value)
+            self.value_name: self.value_field.to_representation(value),
         }
 
 
 class StringLookupField(LookupField):
     def __init__(self, items, **kwargs):
-        kwargs['key_field'] = StringField()
+        kwargs["key_field"] = StringField()
         super(StringLookupField, self).__init__(items, **kwargs)
 
 
 class IntegerLookupField(LookupField):
     def __init__(self, items, **kwargs):
-        kwargs['key_field'] = IntegerField()
+        kwargs["key_field"] = IntegerField()
         super(IntegerLookupField, self).__init__(items, **kwargs)
 
 
 class EnumLookupField(LookupField):
     def __init__(self, enum, items, **kwargs):
-        kwargs['key_field'] = EnumField(enum)
+        kwargs["key_field"] = EnumField(enum)
         super(EnumLookupField, self).__init__(items, **kwargs)
