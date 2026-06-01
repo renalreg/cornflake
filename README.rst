@@ -13,7 +13,7 @@ Cornflake
 .. image:: https://img.shields.io/coveralls/renalreg/cornflake.svg
     :target: https://coveralls.io/github/renalreg/cornflake
 
-Cornflake is a serialization library inspired by `Django REST Framework`_.
+Cornflake is a serialization library inspired by `Django REST Framework`_. this should be migrated to pydantic or marshmallow
 
 Usage
 -----
