@@ -1,1 +1,7 @@
-__version__ = '0.2.4'
+import warnings
+
+warnings.warn(
+    "cornflake is deprecated and should be migrated to pydantic or marshmallow",
+    DeprecationWarning,
+    stacklevel=2,
+)

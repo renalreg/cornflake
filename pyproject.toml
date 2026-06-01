@@ -1,0 +1,41 @@
+[project]
+name = "cornflake"
+version = "1.0.0"
+requires-python = ">=3.8"
+description = "A simple library for converting to and from Python objects - this should be migrated away to pydantic or marshmallow"
+authors = [
+  { name = "Rupert Bedford", email = "rupert.bedford@renalregistry.nhs.uk" }
+]
+license = { text = "MIT" }
+urls = { Homepage = "https://github.com/renalreg/cornflake" }
+dependencies = [
+    "bleach",
+    "iso8601",
+    "pytz",
+    "six",
+]
+
+[project.optional-dependencies]
+sqlalchemy = [
+    "SQLAlchemy",
+]
+
+[dependency-groups]
+dev = [
+    "coverage",
+    "ruff",
+    "freezegun>=1.2",
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "tox>=4.0",
+    "virtualenv>=20.26.6",
+    "wheel>=0.40",
+    "tox-uv",
+]
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

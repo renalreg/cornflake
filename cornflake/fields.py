@@ -1,4 +1,4 @@
-import collections
+from collections.abc import Mapping
 import copy
 import uuid
 from datetime import date, datetime
@@ -18,10 +18,7 @@ class _empty(object):
 
 empty = _empty()
 
-try:
-    basestring
-except NameError:
-    basestring = str
+
 
 
 class Field(object):
@@ -104,7 +101,7 @@ class Field(object):
 
     def get_attribute(self, instance):
         try:
-            if isinstance(instance, collections.Mapping):
+            if isinstance(instance, Mapping):
                 instance = instance[self.source]
             else:
                 instance = getattr(instance, self.source)
@@ -254,7 +251,7 @@ class IntegerField(Field):
     }
 
     def to_internal_value(self, data):
-        if isinstance(data, basestring):
+        if isinstance(data, str):
             data = data.strip()
 
         try:
@@ -279,7 +276,7 @@ class FloatField(Field):
     }
 
     def to_internal_value(self, data):
-        if isinstance(data, basestring):
+        if isinstance(data, str):
             data = data.strip()
 
         try:
