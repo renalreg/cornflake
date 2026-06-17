@@ -1,10 +1,7 @@
 import re
 from datetime import datetime, date
 
-try:
-    from urlparse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import bleach
 import pytz
