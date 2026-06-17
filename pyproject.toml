@@ -1,6 +1,6 @@
 [project]
 name = "cornflake"
-version = "1.0.0"
+version = "1.0.1"
 requires-python = ">=3.8"
 description = "A simple library for converting to and from Python objects - this should be migrated away to pydantic or marshmallow"
 authors = [
