@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/renalreg/cornflake/compare/v1.0.1...v1.0.2) (2026-10-29)
+
+
+### Bug Fixes
+
+* **refactor:** collections mappings ([054799e](https://github.com/renalreg/cornflake/commit/054799e98931e5de150d4e2fb5b1de1c9526e384))
+
 ## [1.0.1](https://github.com/renalreg/cornflake/compare/v1.0.0...v1.0.1) (2026-06-17)
 
 
