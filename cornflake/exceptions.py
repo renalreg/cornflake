@@ -1,5 +1,5 @@
-import collections
 from collections import OrderedDict
+from collections.abc import Mapping
 
 
 class ValidationError(Exception):
@@ -71,7 +71,7 @@ class ValidationError(Exception):
         for field_name, field_errors in errors.items():
             field_path = path + (field_name,)
 
-            if isinstance(field_errors, collections.Mapping):
+            if isinstance(field_errors, Mapping):
                 flattened_field_errors = ValidationError._flatten(
                     field_errors, path=field_path
                 )
